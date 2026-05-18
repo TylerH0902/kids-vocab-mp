@@ -1,0 +1,50 @@
+<view class="page">
+
+  <!-- Language toggle -->
+  <view class="lang-row">
+    <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+    <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+  </view>
+
+  <!-- Title -->
+  <view class="title">🌟 {{lang==='en'?'Vocab Planet':'词汇星球'}}</view>
+
+  <!-- Age group -->
+  <view class="section-label">{{labels.chooseAge}}</view>
+  <view class="card-grid">
+    <view class="card age-card {{ageGroup==='1-3'?'selected':''}}" bindtap="pickAge" data-age="1-3">
+      <text class="card-emoji">👶</text>
+      <text class="card-label">{{labels.age13}}</text>
+    </view>
+    <view class="card age-card {{ageGroup==='3-4'?'selected':''}}" bindtap="pickAge" data-age="3-4">
+      <text class="card-emoji">🧒</text>
+      <text class="card-label">{{labels.age34}}</text>
+    </view>
+    <view class="card age-card {{ageGroup==='5-6'?'selected':''}}" bindtap="pickAge" data-age="5-6">
+      <text class="card-emoji">👦</text>
+      <text class="card-label">{{labels.age56}}</text>
+    </view>
+  </view>
+
+  <!-- Mode -->
+  <view class="section-label">{{labels.chooseMode}}</view>
+  <view class="card-grid">
+    <view class="card mode-card {{gameMode==='casual'?'selected':''}}" bindtap="pickMode" data-mode="casual">
+      <text class="card-emoji">🎮</text>
+      <text class="card-label">{{labels.casual}}</text>
+    </view>
+    <view class="card mode-card {{gameMode==='test'?'selected':''}}" bindtap="pickMode" data-mode="test">
+      <text class="card-emoji">📝</text>
+      <text class="card-label">{{labels.test}}</text>
+    </view>
+  </view>
+
+  <!-- Start buttons -->
+  <button class="btn-primary start-btn" disabled="{{!canStart}}" bindtap="startVocab">
+    ▶ {{labels.start}}
+  </button>
+  <button class="btn-secondary start-btn" disabled="{{!ageGroup}}" bindtap="startSpell">
+    ✏️ {{lang==='en'?'Spelling':'拼写游戏'}}
+  </button>
+
+</view>

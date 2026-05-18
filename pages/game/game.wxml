@@ -1,0 +1,64 @@
+<view class="page">
+
+  <!-- Progress bar -->
+  <view class="prog-row">
+    <view class="prog-bar-wrap">
+      <view class="prog-bar-fill" style="width:{{progress}}%"></view>
+    </view>
+    <text class="prog-text">{{qIndex+1}} / {{total}}</text>
+  </view>
+
+  <!-- Picture zone (young: 1-3 / 3-4) -->
+  <block wx:if="{{!isQuiz}}">
+    <view class="picture-zone {{picState}}" bindtap="speakWord">
+      <image wx:if="{{picUrl}}" class="pic-img" src="{{picUrl}}" mode="aspectFit" />
+      <text wx:elif="{{picLoading}}" class="big-emoji">⏳</text>
+      <text wx:else class="big-emoji">{{currentWord.emoji}}</text>
+      <text class="tap-hint">🔊</text>
+    </view>
+
+    <!-- 2×2 word choices -->
+    <view class="choices-grid">
+      <view
+        wx:for="{{choices}}"
+        wx:key="id"
+        class="choice-card {{item.state}}"
+        bindtap="onChoiceTap"
+        data-id="{{item.id}}"
+      >
+        <text class="choice-text">{{item.label}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- Quiz zone (5-6) -->
+  <block wx:if="{{isQuiz}}">
+    <view class="quiz-zone">
+      <view class="quiz-word" bindtap="speakWord">{{currentWord.en}} 🔊</view>
+      <view class="quiz-def">{{quizDef}}</view>
+    </view>
+    <view class="choices-grid">
+      <view
+        wx:for="{{choices}}"
+        wx:key="id"
+        class="choice-card {{item.state}}"
+        bindtap="onChoiceTap"
+        data-id="{{item.id}}"
+      >
+        <text class="choice-text">{{item.label}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- Feedback bar -->
+  <view class="feedback {{feedbackState}}" wx:if="{{feedbackVisible}}">
+    <text class="fb-text">{{feedbackText}}</text>
+    <view class="fb-next" bindtap="nextWord">{{nextLabel}} →</view>
+  </view>
+
+  <!-- Back button (hidden in test mode) -->
+  <view wx:if="{{showBack}}" class="back-row">
+    <view class="back-btn" bindtap="goHome">← {{homeLabel}}</view>
+  </view>
+
+</view>

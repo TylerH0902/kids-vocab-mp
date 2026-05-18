@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/game/game",
+    "pages/spell/spell",
+    "pages/result/result"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#6C63FF",
+    "navigationBarTitleText": "词汇星球",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5FF"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

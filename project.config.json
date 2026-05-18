@@ -1,0 +1,16 @@
+{
+  "appid": "touristappid",
+  "projectname": "kids-vocab-mp",
+  "description": "Kids bilingual vocabulary app for 小天才 watch",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "2.25.0",
+  "srcMiniprogramRoot": "./",
+  "condition": {}
+}

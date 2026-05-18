@@ -1,0 +1,79 @@
+.page {
+  padding: 20rpx 24rpx 40rpx;
+  min-height: 100vh;
+}
+
+.lang-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12rpx;
+  margin-bottom: 10rpx;
+}
+.lang-btn {
+  padding: 8rpx 22rpx;
+  border-radius: 30rpx;
+  border: 2rpx solid #6C63FF;
+  color: #6C63FF;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+.lang-btn.active {
+  background: #6C63FF;
+  color: #fff;
+}
+
+.title {
+  text-align: center;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #6C63FF;
+  margin-bottom: 28rpx;
+}
+
+.section-label {
+  font-size: 26rpx;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 14rpx;
+  margin-top: 10rpx;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+.age-card {
+  flex: 1 1 calc(33% - 12rpx);
+  min-width: 0;
+}
+.mode-card {
+  flex: 1 1 calc(50% - 8rpx);
+}
+.card {
+  background: #fff;
+  border: 4rpx solid #e8e8e8;
+  border-radius: 20rpx;
+  padding: 18rpx 8rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+.card.selected {
+  border-color: #6C63FF;
+  background: #EEEEFF;
+}
+.card-emoji { font-size: 42rpx; line-height: 1; }
+.card-label { font-size: 24rpx; font-weight: 700; color: #444; }
+
+.start-btn {
+  margin-top: 16rpx;
+  border-radius: 20rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  padding: 18rpx 0;
+  width: 100%;
+}

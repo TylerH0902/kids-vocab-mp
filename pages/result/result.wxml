@@ -1,0 +1,11 @@
+<view class="page">
+  <text class="result-emoji">{{emoji}}</text>
+  <text class="result-title">{{title}}</text>
+  <text class="result-score">{{scoreText}}</text>
+  <view class="score-bar-wrap">
+    <view class="score-bar-fill" style="width:{{pct}}%"></view>
+  </view>
+  <text class="pct-text">{{pct}}%</text>
+  <button class="btn-primary action-btn" bindtap="playAgain">{{playAgainLabel}}</button>
+  <button class="btn-secondary action-btn" bindtap="goHome">{{homeLabel}}</button>
+</view>
