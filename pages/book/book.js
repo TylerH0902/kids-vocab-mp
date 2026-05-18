@@ -20,7 +20,10 @@ Page({
     progress:       0,
     nextLabel:      'Next',
     doneLabel:      'Done',
+    speaking:       false,
   },
+
+  _audioCtx: null,
 
   onLoad(options) {
     const lang  = wx.getStorageSync('lang') || 'en';
@@ -62,7 +65,46 @@ Page({
       choices,
       answered:        false,
       feedbackVisible: false,
+      speaking:        false,
       progress:        Math.round((idx / total) * 100),
+    });
+
+    // Auto-read question on load
+    this._speak(question, lang);
+  },
+
+  speakQuestion() {
+    this._speak(this.data.question, this.data.lang);
+  },
+
+  _speak(text, lang) {
+    if (this._audioCtx) {
+      this._audioCtx.stop();
+      this._audioCtx.destroy();
+      this._audioCtx = null;
+    }
+    this.setData({ speaking: true });
+    wx.textToSpeech({
+      lang:    lang === 'zh' ? 'zh_CN' : 'en_US',
+      speed:   0.9,
+      content: text,
+      success: (res) => {
+        const ctx = wx.createInnerAudioContext();
+        this._audioCtx = ctx;
+        ctx.src = res.filename;
+        ctx.play();
+        ctx.onEnded(() => {
+          this.setData({ speaking: false });
+          ctx.destroy();
+          this._audioCtx = null;
+        });
+        ctx.onError(() => {
+          this.setData({ speaking: false });
+        });
+      },
+      fail: () => {
+        this.setData({ speaking: false });
+      }
     });
   },
 

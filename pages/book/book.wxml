@@ -10,7 +10,10 @@
 
   <!-- Question -->
   <view class="question-box">
-    <text class="book-label">{{bookEmoji}} {{bookTitle}}</text>
+    <view class="question-header">
+      <text class="book-label">{{bookEmoji}} {{bookTitle}}</text>
+      <view class="speak-btn {{speaking?'speaking':''}}" bindtap="speakQuestion">🔊</view>
+    </view>
     <text class="question-text">{{question}}</text>
   </view>
 
