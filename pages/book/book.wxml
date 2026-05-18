@@ -1,0 +1,37 @@
+<view class="page">
+
+  <!-- Progress -->
+  <view class="prog-row">
+    <view class="prog-bar-wrap">
+      <view class="prog-bar-fill" style="width:{{progress}}%"></view>
+    </view>
+    <text class="prog-text">{{qIndex+1}} / {{total}}</text>
+  </view>
+
+  <!-- Question -->
+  <view class="question-box">
+    <text class="book-label">{{bookEmoji}} {{bookTitle}}</text>
+    <text class="question-text">{{question}}</text>
+  </view>
+
+  <!-- Choices -->
+  <view class="choices-list">
+    <view
+      wx:for="{{choices}}"
+      wx:key="id"
+      class="choice-row {{item.state}}"
+      bindtap="onChoiceTap"
+      data-id="{{item.id}}"
+    >
+      <text class="choice-letter">{{item.letter}}</text>
+      <text class="choice-text">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- Feedback + Next -->
+  <view class="feedback {{feedbackState}}" wx:if="{{feedbackVisible}}">
+    <text class="fb-text">{{feedbackText}}</text>
+    <view class="fb-next" bindtap="nextQuestion">{{qIndex+1 >= total ? doneLabel : nextLabel}} →</view>
+  </view>
+
+</view>

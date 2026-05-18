@@ -1,9 +1,10 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/book/book",
+    "pages/result/result",
     "pages/game/game",
-    "pages/spell/spell",
-    "pages/result/result"
+    "pages/spell/spell"
   ],
   "window": {
     "backgroundTextStyle": "light",

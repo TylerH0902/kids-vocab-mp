@@ -1,5 +1,5 @@
 {
-  "appid": "touristappid",
+  "appid": "wx38208cd83c913fa9",
   "projectname": "kids-vocab-mp",
   "description": "Kids bilingual vocabulary app for 小天才 watch",
   "setting": {
@@ -7,10 +7,34 @@
     "es6": true,
     "enhance": true,
     "postcss": true,
-    "minified": true
+    "minified": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
   "compileType": "miniprogram",
   "libVersion": "2.25.0",
   "srcMiniprogramRoot": "./",
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }

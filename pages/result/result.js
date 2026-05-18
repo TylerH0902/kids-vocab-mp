@@ -33,7 +33,9 @@ Page({
 
   playAgain() {
     const o = this._options;
-    if (o.gameType === 'spell') {
+    if (o.gameType === 'book') {
+      wx.redirectTo({ url: `/pages/book/book?id=${o.bookId}` });
+    } else if (o.gameType === 'spell') {
       wx.redirectTo({ url: `/pages/spell/spell?ageGroup=${o.ageGroup}` });
     } else {
       wx.redirectTo({ url: `/pages/game/game?ageGroup=${o.ageGroup}&gameMode=${o.gameMode}` });
