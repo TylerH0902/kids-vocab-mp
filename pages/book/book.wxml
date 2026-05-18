@@ -1,4 +1,8 @@
-<view class="page">
+<view
+  class="page"
+  bindtouchstart="onTouchStart"
+  bindtouchend="onTouchEnd"
+>
 
   <!-- Progress -->
   <view class="prog-row">
@@ -19,17 +23,11 @@
         🔊 {{speaking ? '...' : replayLabel}}
       </view>
     </view>
-    <view class="next-screen-btn" bindtap="showChoices">
-      {{choicesLabel}} →
-    </view>
+    <view class="swipe-hint">← {{swipeHint}} →</view>
   </block>
 
   <!-- SCREEN 2: Choices -->
   <block wx:if="{{step==='choices'}}">
-    <view class="q-reminder" bindtap="speakQuestion">
-      <text class="q-reminder-text">{{question}}</text>
-      <text class="q-reminder-speak">🔊</text>
-    </view>
     <view class="choices-grid">
       <view
         wx:for="{{choices}}"
@@ -39,7 +37,7 @@
         data-id="{{item.id}}"
       >
         <text class="choice-letter">{{item.letter}}</text>
-        <text class="choice-text">{{item.label}}</text>
+        <text class="choice-text" wx:if="{{item.revealed}}">{{item.label}}</text>
         <view class="choice-speak" catchtap="speakChoice" data-label="{{item.label}}">🔊</view>
       </view>
     </view>

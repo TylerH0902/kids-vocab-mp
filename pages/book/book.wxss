@@ -15,18 +15,13 @@
   padding: 32rpx 28rpx;
   box-shadow: 0 4rpx 20rpx rgba(108,99,255,.1);
   margin-bottom: 28rpx;
-  min-height: 200rpx;
+  min-height: 220rpx;
   display: flex;
   align-items: center;
 }
-.question-text {
-  font-size: 38rpx;
-  font-weight: 600;
-  color: #333;
-  line-height: 1.6;
-}
+.question-text { font-size: 38rpx; font-weight: 600; color: #333; line-height: 1.6; }
 
-.speak-row { display:flex; justify-content:center; margin-bottom:28rpx; }
+.speak-row { display:flex; justify-content:center; margin-bottom:24rpx; }
 .replay-btn {
   display: flex;
   align-items: center;
@@ -40,65 +35,36 @@
   border-radius: 60rpx;
   transition: opacity 0.2s;
 }
-.replay-btn.speaking { opacity: 0.45; }
+.replay-btn.speaking { opacity: 0.4; }
 
-.next-screen-btn {
-  background: #6C63FF;
-  color: #fff;
-  font-size: 38rpx;
-  font-weight: 700;
-  text-align: center;
-  padding: 24rpx 0;
-  border-radius: 24rpx;
-}
+.swipe-hint { text-align:center; font-size:26rpx; color:#bbb; }
 
 /* ── Screen 2: Choices ── */
-.q-reminder {
-  display: flex;
-  align-items: flex-start;
-  gap: 12rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 18rpx 20rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,.06);
-}
-.q-reminder-text {
-  flex: 1;
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.q-reminder-speak { font-size: 36rpx; flex-shrink: 0; }
-
 .choices-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
+  gap: 18rpx;
 }
 .choice-block {
   background: #fff;
   border: 3rpx solid #e0e0e0;
   border-radius: 20rpx;
-  padding: 20rpx 14rpx 14rpx;
+  padding: 24rpx 14rpx 18rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
-  min-height: 160rpx;
+  gap: 12rpx;
+  min-height: 200rpx;
+  justify-content: space-between;
 }
 .choice-block.correct { border-color: #4CAF50; background: #e8f8e8; }
 .choice-block.wrong   { border-color: #f44336; background: #fee8e8; }
 
 .choice-letter {
-  width: 56rpx; height: 56rpx; border-radius: 50%;
+  width: 72rpx; height: 72rpx; border-radius: 50%;
   background: #6C63FF; color: #fff;
-  font-size: 30rpx; font-weight: 800;
-  text-align: center; line-height: 56rpx;
+  font-size: 38rpx; font-weight: 800;
+  text-align: center; line-height: 72rpx;
   flex-shrink: 0;
 }
 .choice-block.correct .choice-letter { background: #4CAF50; }
@@ -107,9 +73,9 @@
 .choice-text {
   font-size: 28rpx; color: #333;
   line-height: 1.4; text-align: center;
-  flex: 1;
+  flex: 1; width: 100%;
 }
-.choice-speak { font-size: 34rpx; }
+.choice-speak { font-size: 38rpx; }
 
 /* Feedback */
 .feedback {
