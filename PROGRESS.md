@@ -8,25 +8,31 @@ Source app: /Users/hanliwei/projects/kids-vocab/index.html
 ### Core
 - [x] Directory structure created
 - [x] PROGRESS.md
-- [ ] project.config.json
-- [ ] app.json
-- [ ] app.js
-- [ ] app.wxss
+- [x] project.config.json
+- [x] app.json
+- [x] app.js
+- [x] app.wxss
 
 ### Utils
-- [ ] utils/words.js       — base WORDS array (from index.html ~line 369)
-- [ ] utils/words13.js     — adapted from data/words_13_new.js
-- [ ] utils/words34.js     — adapted from data/words_34_extra.js
-- [ ] utils/words56.js     — adapted from data/words_56_extra.js
-- [ ] utils/game.js        — shuffle, dedup, getDistractors, pool building
-- [ ] utils/i18n.js        — UI language strings (EN/ZH toggle)
-- [ ] utils/pixabay.js     — image fetch + wx.setStorage cache
+- [x] utils/words.js       — base WORDS array (70 words with def_en/def_zh)
+- [x] utils/words13.js     — 412 words (adapted from data/words_13_new.js)
+- [x] utils/words34.js     — 1018 words (adapted from data/words_34_extra.js)
+- [x] utils/words56.js     — 986 words (adapted from data/words_56_extra.js)
+- [x] utils/game.js        — shuffle, dedup, getDistractors, pool building
+- [x] utils/i18n.js        — UI language strings (EN/ZH toggle)
+- [x] utils/pixabay.js     — image fetch + wx.setStorage cache
 
 ### Pages
-- [ ] pages/index/         — age group + mode selection (setup screen)
-- [ ] pages/game/          — main game (young tap-to-answer + quiz MCQ)
-- [ ] pages/spell/         — spelling game
-- [ ] pages/result/        — score screen
+- [x] pages/index/         — age group + mode selection (setup screen)
+- [x] pages/game/          — main game (young tap-to-answer + quiz MCQ)
+- [x] pages/spell/         — spelling game
+- [x] pages/result/        — score screen
+
+### Remaining
+- [ ] Test in WeChat DevTools — open project at /Users/hanliwei/projects/kids-vocab-mp
+- [ ] Fix any runtime errors found during testing
+- [ ] Verify 240×240 layout on watch simulator
+- [ ] Add audio files (copy /kids-vocab/audio/ → kids-vocab-mp/audio/ if needed)
 
 ## Key Design Decisions
 - No drag-and-drop (too fiddly on watch) — tap card to answer
@@ -39,4 +45,4 @@ Source app: /Users/hanliwei/projects/kids-vocab/index.html
 - Back button hidden during test mode
 
 ## Session Log
-- Session 1: Directory structure + PROGRESS.md created. Starting app core files.
+- Session 1: All files created and committed. Ready for DevTools testing.
