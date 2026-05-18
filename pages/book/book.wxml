@@ -8,34 +8,47 @@
     <text class="prog-text">{{qIndex+1}} / {{total}}</text>
   </view>
 
-  <!-- Question -->
-  <view class="question-box">
-    <view class="question-header">
-      <text class="book-label">{{bookEmoji}} {{bookTitle}}</text>
-      <view class="speak-btn {{speaking?'speaking':''}}" bindtap="speakQuestion">🔊</view>
+  <!-- SCREEN 1: Question -->
+  <block wx:if="{{step==='question'}}">
+    <text class="book-label">{{bookEmoji}} {{bookTitle}}</text>
+    <view class="question-card">
+      <text class="question-text">{{question}}</text>
     </view>
-    <text class="question-text">{{question}}</text>
-  </view>
-
-  <!-- Choices -->
-  <view class="choices-list">
-    <view
-      wx:for="{{choices}}"
-      wx:key="id"
-      class="choice-row {{item.state}}"
-      bindtap="onChoiceTap"
-      data-id="{{item.id}}"
-    >
-      <text class="choice-letter">{{item.letter}}</text>
-      <text class="choice-text">{{item.label}}</text>
-      <view class="choice-speak" catchtap="speakChoice" data-label="{{item.label}}">🔊</view>
+    <view class="speak-row">
+      <view class="replay-btn {{speaking?'speaking':''}}" bindtap="speakQuestion">
+        🔊 {{speaking ? '...' : replayLabel}}
+      </view>
     </view>
-  </view>
+    <view class="next-screen-btn" bindtap="showChoices">
+      {{choicesLabel}} →
+    </view>
+  </block>
 
-  <!-- Feedback + Next -->
-  <view class="feedback {{feedbackState}}" wx:if="{{feedbackVisible}}">
-    <text class="fb-text">{{feedbackText}}</text>
-    <view class="fb-next" bindtap="nextQuestion">{{qIndex+1 >= total ? doneLabel : nextLabel}} →</view>
-  </view>
+  <!-- SCREEN 2: Choices -->
+  <block wx:if="{{step==='choices'}}">
+    <view class="q-reminder" bindtap="speakQuestion">
+      <text class="q-reminder-text">{{question}}</text>
+      <text class="q-reminder-speak">🔊</text>
+    </view>
+    <view class="choices-grid">
+      <view
+        wx:for="{{choices}}"
+        wx:key="id"
+        class="choice-block {{item.state}}"
+        bindtap="onChoiceTap"
+        data-id="{{item.id}}"
+      >
+        <text class="choice-letter">{{item.letter}}</text>
+        <text class="choice-text">{{item.label}}</text>
+        <view class="choice-speak" catchtap="speakChoice" data-label="{{item.label}}">🔊</view>
+      </view>
+    </view>
+
+    <!-- Feedback + Next -->
+    <view class="feedback {{feedbackState}}" wx:if="{{feedbackVisible}}">
+      <text class="fb-text">{{feedbackText}}</text>
+      <view class="fb-next" bindtap="nextQuestion">{{qIndex+1 >= total ? doneLabel : nextLabel}} →</view>
+    </view>
+  </block>
 
 </view>

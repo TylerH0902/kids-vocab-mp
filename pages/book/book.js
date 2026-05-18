@@ -1,44 +1,49 @@
-const BOOKS  = require('../../utils/books');
+const BOOKS = require('../../utils/books');
 const { t }  = require('../../utils/i18n');
 
 Page({
   data: {
-    lang:           'en',
-    bookId:         '',
-    bookTitle:      '',
-    bookEmoji:      '',
-    questions:      [],
-    qIndex:         0,
-    total:          0,
-    correct:        0,
-    question:       '',
-    choices:        [],
-    answered:       false,
+    lang:            'en',
+    bookId:          '',
+    bookTitle:       '',
+    bookEmoji:       '',
+    questions:       [],
+    qIndex:          0,
+    total:           0,
+    correct:         0,
+    step:            'question',  // 'question' | 'choices'
+    question:        '',
+    choices:         [],
+    answered:        false,
     feedbackVisible: false,
-    feedbackText:   '',
-    feedbackState:  '',
-    progress:       0,
-    nextLabel:      'Next',
-    doneLabel:      'Done',
-    speaking:       false,
+    feedbackText:    '',
+    feedbackState:   '',
+    progress:        0,
+    speaking:        false,
+    replayLabel:     'Replay',
+    choicesLabel:    'See choices',
+    nextLabel:       'Next',
+    doneLabel:       'Done',
   },
 
   _audioCtx: null,
 
   onLoad(options) {
-    const lang  = wx.getStorageSync('lang') || 'en';
-    const book  = BOOKS.find(b => b.id === options.id);
+    const lang = wx.getStorageSync('lang') || 'en';
+    const book = BOOKS.find(b => b.id === options.id);
     if (!book) { wx.navigateBack(); return; }
 
     this.setData({
       lang,
-      bookId:    book.id,
-      bookTitle: lang === 'en' ? book.title_en : book.title_zh,
-      bookEmoji: book.emoji,
-      questions: book.questions,
-      total:     book.questions.length,
-      nextLabel: t(lang, 'next').replace(' →', ''),
-      doneLabel: t(lang, 'done'),
+      bookId:       book.id,
+      bookTitle:    lang === 'en' ? book.title_en : book.title_zh,
+      bookEmoji:    book.emoji,
+      questions:    book.questions,
+      total:        book.questions.length,
+      replayLabel:  lang === 'en' ? 'Replay' : '重播',
+      choicesLabel: lang === 'en' ? 'See choices' : '查看选项',
+      nextLabel:    lang === 'en' ? 'Next' : '下一题',
+      doneLabel:    lang === 'en' ? 'Done' : '完成',
     });
 
     this._loadQuestion(0);
@@ -48,29 +53,33 @@ Page({
     const { questions, lang, total } = this.data;
     if (idx >= total) { this._showResult(); return; }
 
-    const q        = questions[idx];
+    const q       = questions[idx];
     const question = lang === 'en' ? q.q_en : q.q_zh;
     const letters  = ['A', 'B', 'C', 'D'];
     const choices  = q.opts.map((o, i) => ({
-      id:     o.id,
-      label:  lang === 'en' ? o.en : o.zh,
-      letter: letters[i],
+      id:      o.id,
+      label:   lang === 'en' ? o.en : o.zh,
+      letter:  letters[i],
       correct: o.correct,
-      state:  ''
+      state:   ''
     }));
 
     this.setData({
       qIndex:          idx,
       question,
       choices,
+      step:            'question',
       answered:        false,
       feedbackVisible: false,
       speaking:        false,
       progress:        Math.round((idx / total) * 100),
     });
 
-    // Auto-read question on load
     this._speak(question, lang);
+  },
+
+  showChoices() {
+    this.setData({ step: 'choices' });
   },
 
   speakQuestion() {
@@ -79,6 +88,35 @@ Page({
 
   speakChoice(e) {
     this._speak(e.currentTarget.dataset.label, this.data.lang);
+  },
+
+  onChoiceTap(e) {
+    if (this.data.answered) return;
+    const id     = e.currentTarget.dataset.id;
+    const { choices, lang } = this.data;
+    const tapped = choices.find(c => c.id === id);
+    const isRight = tapped && tapped.correct;
+
+    const updated = choices.map(c => ({
+      ...c,
+      state: c.id === id
+        ? (isRight ? 'correct' : 'wrong')
+        : (c.correct && !isRight ? 'correct' : '')
+    }));
+
+    this.setData({
+      answered:        true,
+      choices:         updated,
+      feedbackVisible: true,
+      feedbackText:    t(lang, isRight ? 'correct' : 'wrong'),
+      feedbackState:   isRight ? 'correct' : 'wrong',
+      correct:         isRight ? this.data.correct + 1 : this.data.correct,
+    });
+  },
+
+  nextQuestion() {
+    if (!this.data.answered) return;
+    this._loadQuestion(this.data.qIndex + 1);
   },
 
   _speak(text, lang) {
@@ -102,48 +140,10 @@ Page({
           ctx.destroy();
           this._audioCtx = null;
         });
-        ctx.onError(() => {
-          this.setData({ speaking: false });
-        });
+        ctx.onError(() => this.setData({ speaking: false }));
       },
-      fail: () => {
-        this.setData({ speaking: false });
-      }
+      fail: () => this.setData({ speaking: false })
     });
-  },
-
-  onChoiceTap(e) {
-    if (this.data.answered) return;
-    const id      = e.currentTarget.dataset.id;
-    const { choices, lang } = this.data;
-    const tapped  = choices.find(c => c.id === id);
-    const isRight = tapped && tapped.correct;
-
-    const updated = choices.map(c => ({
-      ...c,
-      state: c.id === id
-        ? (isRight ? 'correct' : 'wrong')
-        : (c.correct && !isRight ? 'correct' : '')
-    }));
-
-    this.setData({
-      answered:        true,
-      choices:         updated,
-      feedbackVisible: true,
-      feedbackText:    t(lang, isRight ? 'correct' : 'wrong'),
-      feedbackState:   isRight ? 'correct' : 'wrong',
-      correct:         isRight ? this.data.correct + 1 : this.data.correct,
-    });
-  },
-
-  nextQuestion() {
-    if (!this.data.answered) return;
-    const next = this.data.qIndex + 1;
-    if (next >= this.data.total) {
-      this._showResult();
-    } else {
-      this._loadQuestion(next);
-    }
   },
 
   _showResult() {
