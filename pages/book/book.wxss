@@ -40,6 +40,7 @@
 .choice-row.correct .choice-letter { background: #4CAF50; }
 .choice-row.wrong   .choice-letter { background: #f44336; }
 .choice-text { font-size: 32rpx; color: #333; line-height: 1.4; flex: 1; }
+.choice-speak { font-size: 36rpx; flex-shrink: 0; padding: 4rpx 6rpx; }
 
 .feedback {
   position: fixed; bottom:0; left:0; right:0;

@@ -28,6 +28,7 @@
     >
       <text class="choice-letter">{{item.letter}}</text>
       <text class="choice-text">{{item.label}}</text>
+      <view class="choice-speak" catchtap="speakChoice" data-label="{{item.label}}">🔊</view>
     </view>
   </view>
 

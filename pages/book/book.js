@@ -77,6 +77,10 @@ Page({
     this._speak(this.data.question, this.data.lang);
   },
 
+  speakChoice(e) {
+    this._speak(e.currentTarget.dataset.label, this.data.lang);
+  },
+
   _speak(text, lang) {
     if (this._audioCtx) {
       this._audioCtx.stop();
