@@ -42,14 +42,24 @@ const TERRAIN_ICONS = [
   { type: 'flowers',  lat:  0.32, lon:  2.72 },
 ];
 
+// Ocean sparkle dots at fixed lat/lon — rotate with the planet
+const OCEAN_SPARKLES = [
+  [-0.10, 0.20], [ 0.35,-0.80], [-0.50, 0.40], [ 0.15, 1.30], [-0.30, 2.10],
+  [ 0.55, 3.20], [-0.20, 3.80], [ 0.10, 4.50], [-0.45, 5.20], [ 0.38, 5.80],
+  [ 0.60, 0.90], [-0.65, 1.60], [ 0.25,-0.30], [-0.15, 2.70], [ 0.50, 4.10],
+  [-0.38, 3.50], [ 0.08, 5.50], [-0.55, 4.80], [ 0.42, 2.00], [-0.22, 0.70],
+  [ 0.70,-0.50], [-0.72, 2.80], [ 0.18, 3.40], [-0.48, 5.90], [ 0.35, 1.80],
+  [-0.05, 4.30], [ 0.62, 1.50], [-0.35, 0.10], [ 0.28,-0.60], [-0.60, 3.20],
+];
+
 Page({
   data: { lang: 'en', hintVisible: true, hintText: '' },
 
   _canvas: null, _ctx: null,
   _w: 0, _h: 0, _cx: 0, _cy: 0, _R: 0,
-  _rotY: 0.50,
+  _rotY: 0.50, _rotX: 0.35,
   _zoom: 1.0,
-  _dragStartX: 0, _dragStartRot: 0, _isDragging: false,
+  _dragStartX: 0, _dragStartY: 0, _dragStartRot: 0, _dragStartRotX: 0, _isDragging: false,
   _lastTapTime: 0, _tapTimer: null,
 
   onLoad() {
@@ -96,9 +106,9 @@ Page({
     const cosR = Math.cos(this._rotY), sinR = Math.sin(this._rotY);
     const x1 =  x0 * cosR + z0 * sinR;
     const z1 = -x0 * sinR + z0 * cosR;
-    const tilt = 0.35;
-    const y2 = y0 * Math.cos(tilt) - z1 * Math.sin(tilt);
-    const z2 = y0 * Math.sin(tilt) + z1 * Math.cos(tilt);
+    const cosX = Math.cos(this._rotX), sinX = Math.sin(this._rotX);
+    const y2 = y0 * cosX - z1 * sinX;
+    const z2 = y0 * sinX + z1 * cosX;
     const fov   = R * 3.2;
     const scale = fov / (fov + z2);
     return { sx: cx + x1 * scale, sy: cy - y2 * scale, z: z2, scale, visible: z2 > -R * 0.1 };
@@ -114,17 +124,16 @@ Page({
     ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
     this._drawStars(ctx, w, h);
 
-    const glow = ctx.createRadialGradient(cx, cy, R*0.85, cx, cy, R*1.35);
-    glow.addColorStop(0, 'rgba(100,181,246,0.22)');
-    glow.addColorStop(1, 'rgba(100,181,246,0)');
-    ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(cx, cy, R*1.35, 0, TWO_PI); ctx.fill();
-
-    const ocean = ctx.createRadialGradient(cx-R*0.25, cy-R*0.28, R*0.04, cx, cy, R);
-    ocean.addColorStop(0, '#90CAF9'); ocean.addColorStop(0.25, '#42A5F5');
-    ocean.addColorStop(0.6, '#1565C0'); ocean.addColorStop(1, '#0D3A7A');
+    // Solid ocean — stays visibly blue all the way to the edge
+    const ocean = ctx.createRadialGradient(cx-R*0.28, cy-R*0.30, R*0.05, cx, cy, R);
+    ocean.addColorStop(0, '#7DD4F0');
+    ocean.addColorStop(0.5, '#3FA8DC');
+    ocean.addColorStop(1, '#1A7BB8');
     ctx.fillStyle = ocean;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.fill();
+
+    // Ocean sparkle texture
+    this._drawOceanSparkles(ctx, cx, cy, R);
 
     // Terrain patches clipped to sphere
     ctx.save();
@@ -132,12 +141,17 @@ Page({
     this._drawTerrainPatches(ctx, R);
     ctx.restore();
 
-    // Specular shine on sphere
-    const shine = ctx.createRadialGradient(cx-R*0.32, cy-R*0.34, 0, cx-R*0.18, cy-R*0.2, R*0.52);
-    shine.addColorStop(0, 'rgba(255,255,255,0.22)');
+    // Subtle top-left highlight (not glassy)
+    const shine = ctx.createRadialGradient(cx-R*0.35, cy-R*0.38, 0, cx-R*0.20, cy-R*0.22, R*0.45);
+    shine.addColorStop(0, 'rgba(255,255,255,0.18)');
     shine.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = shine;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.fill();
+
+    // Dark cartoon border
+    ctx.strokeStyle = '#1A1A2E';
+    ctx.lineWidth = R * 0.022;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.stroke();
 
     this._drawTerrainIcons(ctx, R);
     this._drawRoad(ctx, R);
@@ -147,6 +161,19 @@ Page({
       book: BOOKS[s.bookIdx], color: COLORS[i], roadIdx: i,
     })).sort((a, b) => a.z - b.z);
     for (const pt of pts) this._drawCheckpoint(ctx, pt, R);
+  },
+
+  // ── Ocean sparkle dots (3D lat/lon — rotate with planet) ─────────
+  _drawOceanSparkles(ctx, cx, cy, R) {
+    for (const [lat, lon] of OCEAN_SPARKLES) {
+      const pt = this._project(lat, lon);
+      if (!pt.visible) continue;
+      const alpha = Math.max(0, Math.min(0.7, (pt.z + R) / (R * 1.5)));
+      ctx.globalAlpha = alpha * 0.7;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(pt.sx, pt.sy, 1.6, 0, TWO_PI); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   },
 
   // ── Organic continent patches ──────────────────────────────────────
@@ -183,7 +210,7 @@ Page({
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.fillStyle = grad; ctx.fill();
-      ctx.strokeStyle = patch.stroke; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.strokeStyle = '#1A1A2E'; ctx.lineWidth = Math.max(1.2, R * 0.012 * pt.scale); ctx.stroke();
       ctx.restore();
     }
   },
@@ -414,15 +441,22 @@ Page({
 
   // ── Touch handlers ────────────────────────────────────────────────
   onTouchStart(e) {
-    this._dragStartX   = e.touches[0].x;
-    this._dragStartRot = this._rotY;
-    this._isDragging   = false;
+    const t = e.touches[0];
+    this._dragStartX    = t.x;
+    this._dragStartY    = t.y;
+    this._dragStartRot  = this._rotY;
+    this._dragStartRotX = this._rotX;
+    this._isDragging    = false;
   },
 
   onTouchMove(e) {
-    const dx = e.touches[0].x - this._dragStartX;
-    if (Math.abs(dx) > 4) this._isDragging = true;
-    this._rotY = this._dragStartRot + dx / (this._R * this._zoom * 1.1);
+    const t  = e.touches[0];
+    const dx = t.x - this._dragStartX;
+    const dy = t.y - this._dragStartY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) this._isDragging = true;
+    this._rotY = this._dragStartRot  + dx / (this._R * this._zoom * 1.1);
+    this._rotX = this._dragStartRotX + dy / (this._R * this._zoom * 1.1);
+    this._rotX = Math.max(-1.4, Math.min(1.4, this._rotX));
     this._draw();
   },
 
