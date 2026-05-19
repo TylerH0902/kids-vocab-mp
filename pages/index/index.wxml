@@ -1,22 +1,23 @@
 <view class="page">
 
-  <!-- Header row -->
-  <view class="header-row">
-    <text class="title">📚 {{lang==='en'?'Book Quiz':'书本问答'}}</text>
+  <canvas
+    id="planet-canvas"
+    type="2d"
+    class="planet-canvas"
+    bindtouchstart="onTouchStart"
+    catchtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  ></canvas>
+
+  <!-- Header floats over planet -->
+  <view class="header-overlay">
+    <text class="app-title">🌟 {{lang==='en'?'Story Quest':'故事大冒险'}}</text>
     <view class="lang-row">
       <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
       <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
     </view>
   </view>
 
-  <!-- Book list -->
-  <view wx:for="{{books}}" wx:key="id" class="book-card book-card-{{index%4}}" bindtap="openBook" data-id="{{item.id}}">
-    <text class="book-emoji">{{item.emoji}}</text>
-    <view class="book-info">
-      <text class="book-title">{{lang==='en'?item.title_en:item.title_zh}}</text>
-      <text class="book-sub">{{lang==='en'?item.sub_en:item.sub_zh}}</text>
-    </view>
-    <text class="book-arrow">›</text>
-  </view>
+  <text class="hint">{{lang==='en'?'swipe to spin · tap a star to play':'左右滑动 · 点击星球探索'}}</text>
 
 </view>
