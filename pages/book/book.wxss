@@ -57,8 +57,8 @@
   min-height: 200rpx;
   justify-content: space-between;
 }
-.choice-block.correct { border-color: #4CAF50; background: #e8f8e8; }
-.choice-block.wrong   { border-color: #f44336; background: #fee8e8; }
+.choice-block.correct { border-color: #4CAF50; background: #e8f8e8; animation: correctBounce .45s ease; }
+.choice-block.wrong   { border-color: #f44336; background: #fee8e8; animation: wrongShake .4s ease; }
 
 .choice-letter {
   width: 72rpx; height: 72rpx; border-radius: 50%;
@@ -77,12 +77,32 @@
 }
 .choice-speak { font-size: 38rpx; }
 
+/* Animations */
+@keyframes correctBounce {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.1); }
+  65%  { transform: scale(.97); }
+  100% { transform: scale(1); }
+}
+@keyframes wrongShake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-12rpx); }
+  40%     { transform: translateX(12rpx); }
+  60%     { transform: translateX(-8rpx); }
+  80%     { transform: translateX(8rpx); }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
 /* Feedback */
 .feedback {
   position: fixed; bottom:0; left:0; right:0;
   padding: 24rpx 28rpx;
   display: flex; align-items: center; justify-content: space-between;
   z-index: 99;
+  animation: slideUp .3s ease;
 }
 .feedback.correct { background: #4CAF50; }
 .feedback.wrong   { background: #f44336; }
