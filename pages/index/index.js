@@ -2,24 +2,24 @@ const BOOKS = require('../../utils/books');
 
 const TWO_PI = Math.PI * 2;
 
-// Lat/lon positions (radians) for 6 books — evenly spaced around equator, slight lat offsets
-const POSITIONS = [
-  { lat:  0.18, lon: 0 },
-  { lat: -0.22, lon: TWO_PI * 1/6 },
-  { lat:  0.28, lon: TWO_PI * 2/6 },
-  { lat: -0.12, lon: TWO_PI * 3/6 },
-  { lat:  0.22, lon: TWO_PI * 4/6 },
-  { lat: -0.18, lon: TWO_PI * 5/6 },
+// Ordered road stops: {bookIdx, lat, lon}
+// Open road — caterpillar → wildthings → alice → wonder (more to come)
+const ROAD = [
+  { bookIdx: 3, lat: -0.10, lon: -0.50 },  // 🐛 caterpillar  (start)
+  { bookIdx: 4, lat:  0.22, lon:  0.60 },  // 🦁 wildthings
+  { bookIdx: 0, lat: -0.15, lon:  1.65 },  // 🐰 alice
+  { bookIdx: 5, lat:  0.28, lon:  2.75 },  // ⭐ wonder        (current end)
 ];
 
-const COLORS = ['#FF6B35','#00C896','#FF69B4','#FFD93D','#9B59B6','#2979FF'];
+// Per-stop accent colours
+const COLORS = ['#FF6B6B', '#FF9A3C', '#9B59B6', '#2979FF'];
 
 Page({
   data: { lang: 'en' },
 
   _canvas: null, _ctx: null,
   _w: 0, _h: 0, _cx: 0, _cy: 0, _R: 0,
-  _rotY: 0.4,
+  _rotY: 0.50,          // caterpillar faces viewer on load
   _dragStartX: 0, _dragStartRot: 0, _isDragging: false,
 
   onLoad() {
@@ -57,31 +57,25 @@ Page({
   // ── 3D projection ─────────────────────────────────────────────────
   _project(lat, lon) {
     const { _cx: cx, _cy: cy, _R: R, _rotY: rotY } = this;
-
-    // Sphere → Cartesian
     const x0 = R * Math.cos(lat) * Math.sin(lon);
     const y0 = R * Math.sin(lat);
     const z0 = R * Math.cos(lat) * Math.cos(lon);
 
-    // Rotate around Y axis
     const cosR = Math.cos(rotY), sinR = Math.sin(rotY);
     const x1 =  x0 * cosR + z0 * sinR;
     const z1 = -x0 * sinR + z0 * cosR;
 
-    // Tilt ~20° forward so we see the planet slightly from above
     const tilt = 0.35;
     const cosT = Math.cos(tilt), sinT = Math.sin(tilt);
     const y2 = y0 * cosT - z1 * sinT;
     const z2 = y0 * sinT + z1 * cosT;
 
-    // Perspective
     const fov   = R * 3.2;
     const scale = fov / (fov + z2);
     return {
       sx: cx + x1 * scale,
       sy: cy - y2 * scale,
-      z:  z2,
-      scale,
+      z:  z2, scale,
       visible: z2 > -R * 0.1,
     };
   },
@@ -116,18 +110,22 @@ Page({
     ctx.fillStyle = planet;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.fill();
 
-    // Specular shine
+    // Specular
     const shine = ctx.createRadialGradient(cx - R*0.32, cy - R*0.34, 0, cx - R*0.18, cy - R*0.2, R*0.52);
     shine.addColorStop(0, 'rgba(255,255,255,0.38)');
     shine.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = shine;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.fill();
 
-    // Road + checkpoints (back → front)
+    // Road (dotted) + arrows between stops
     this._drawRoad(ctx);
-    const pts = POSITIONS.map((p, i) => ({
-      ...this._project(p.lat, p.lon),
-      book: BOOKS[i], color: COLORS[i], idx: i,
+
+    // Checkpoints sorted back→front
+    const pts = ROAD.map((stop, i) => ({
+      ...this._project(stop.lat, stop.lon),
+      book:  BOOKS[stop.bookIdx],
+      color: COLORS[i],
+      roadIdx: i,
     })).sort((a, b) => a.z - b.z);
 
     for (const pt of pts) this._drawCheckpoint(ctx, pt);
@@ -150,26 +148,58 @@ Page({
   },
 
   _drawRoad(ctx) {
-    const n = POSITIONS.length;
-    for (let i = 0; i < n; i++) {
-      const a = POSITIONS[i], b = POSITIONS[(i + 1) % n];
-      const steps = 14;
+    const R = this._R;
+    const n = ROAD.length;
+
+    for (let i = 0; i < n - 1; i++) {       // n-1: open road, no wrap
+      const a = ROAD[i], b = ROAD[i + 1];
+
       // Unwrap longitude
       let lonA = a.lon, lonB = b.lon;
       if (lonB - lonA >  Math.PI) lonA += TWO_PI;
       if (lonA - lonB >  Math.PI) lonB += TWO_PI;
 
-      for (let s = 0; s < steps; s++) {
+      const steps = 16;
+
+      // --- Dotted path ---
+      for (let s = 0; s <= steps; s++) {
         const t   = s / steps;
         const lat = a.lat + (b.lat - a.lat) * t;
         const lon = lonA  + (lonB  - lonA)  * t;
         const pt  = this._project(lat, lon);
-        const depthAlpha = Math.max(0.1, Math.min(0.65, (pt.z + this._R) / (2 * this._R)));
-        ctx.fillStyle = `rgba(255,215,0,${depthAlpha})`;
+        const alpha = Math.max(0.08, Math.min(0.65, (pt.z + R) / (2 * R)));
+        ctx.fillStyle = `rgba(255,215,0,${alpha})`;
         ctx.beginPath();
-        ctx.arc(pt.sx, pt.sy, 3.5, 0, TWO_PI);
+        ctx.arc(pt.sx, pt.sy, 3, 0, TWO_PI);
         ctx.fill();
       }
+
+      // --- Arrow at ~55% along the segment (past midpoint, clearly directional) ---
+      const at = 0.55;
+      const arLat  = a.lat + (b.lat - a.lat) * at;
+      const arLon  = lonA  + (lonB  - lonA)  * at;
+      const arLat2 = a.lat + (b.lat - a.lat) * (at + 0.08);
+      const arLon2 = lonA  + (lonB  - lonA)  * (at + 0.08);
+
+      const ptA = this._project(arLat,  arLon);
+      const ptB = this._project(arLat2, arLon2);
+
+      const alpha = Math.max(0.1, Math.min(0.85, (ptA.z + R) / (R * 1.5)));
+      const angle = Math.atan2(ptB.sy - ptA.sy, ptB.sx - ptA.sx);
+      const sz    = 9 * Math.max(0.5, ptA.scale);
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle   = '#FFD93D';
+      ctx.translate(ptA.sx, ptA.sy);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo( sz,       0);
+      ctx.lineTo(-sz * 0.6,  sz * 0.55);
+      ctx.lineTo(-sz * 0.6, -sz * 0.55);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
     }
   },
 
@@ -180,35 +210,29 @@ Page({
 
     ctx.globalAlpha = alpha;
 
-    // Glow ring for front-facing
     if (z > R * 0.1) {
       ctx.fillStyle = color + '44';
-      ctx.beginPath();
-      ctx.arc(sx, sy, size * 1.6, 0, TWO_PI);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(sx, sy, size * 1.6, 0, TWO_PI); ctx.fill();
     }
 
-    // Circle fill
     ctx.fillStyle = color;
     ctx.beginPath(); ctx.arc(sx, sy, size, 0, TWO_PI); ctx.fill();
 
-    // White border
     ctx.strokeStyle = 'rgba(255,255,255,0.85)';
     ctx.lineWidth   = 2.5;
     ctx.stroke();
 
-    // Emoji
     const fontSize = Math.round(size * 1.05);
-    ctx.font          = `${fontSize}px sans-serif`;
-    ctx.textAlign     = 'center';
-    ctx.textBaseline  = 'middle';
-    ctx.fillStyle     = '#fff';
+    ctx.font         = `${fontSize}px sans-serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = '#fff';
     ctx.fillText(book.emoji, sx, sy);
 
     ctx.globalAlpha = 1;
   },
 
-  // ── Touch handling ────────────────────────────────────────────────
+  // ── Touch ─────────────────────────────────────────────────────────
   onTouchStart(e) {
     const t = e.touches[0];
     this._dragStartX   = t.x;
@@ -225,18 +249,18 @@ Page({
 
   onTouchEnd(e) {
     if (this._isDragging) return;
-    const t = e.changedTouches[0];
+    const t  = e.changedTouches[0];
     const tx = t.x, ty = t.y;
 
-    let best = -1, bestDist = this._R * 0.28;
-    for (let i = 0; i < POSITIONS.length; i++) {
-      const pt = this._project(POSITIONS[i].lat, POSITIONS[i].lon);
+    let best = -1, bestDist = this._R * 0.3;
+    for (let i = 0; i < ROAD.length; i++) {
+      const pt = this._project(ROAD[i].lat, ROAD[i].lon);
       if (!pt.visible) continue;
       const d = Math.hypot(tx - pt.sx, ty - pt.sy);
       if (d < bestDist) { bestDist = d; best = i; }
     }
     if (best >= 0) {
-      wx.navigateTo({ url: `/pages/book/book?id=${BOOKS[best].id}` });
+      wx.navigateTo({ url: `/pages/book/book?id=${BOOKS[ROAD[best].bookIdx].id}` });
     }
   },
 
