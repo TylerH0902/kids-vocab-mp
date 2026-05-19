@@ -4,6 +4,12 @@
   bindtouchend="onTouchEnd"
 >
 
+  <!-- Lang toggle -->
+  <view class="lang-row">
+    <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+    <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+  </view>
+
   <!-- Progress -->
   <view class="prog-row">
     <view class="prog-bar-wrap">

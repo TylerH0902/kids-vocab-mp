@@ -13,11 +13,30 @@ page { background: #080C24; }
   width: 100%;
   height: 320rpx;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   padding-bottom: 0;
   border-radius: 0 0 60% 60% / 0 0 40rpx 40rpx;
   box-shadow: 0 8rpx 40rpx rgba(0,0,0,0.4);
+  position: relative;
+}
+
+/* Lang toggle sits top-right of the band */
+.lang-row {
+  position: absolute;
+  top: 20rpx; right: 24rpx;
+  display: flex; gap: 10rpx;
+}
+.lang-btn {
+  padding: 6rpx 18rpx; border-radius: 30rpx;
+  border: 2rpx solid rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.85);
+  font-size: 22rpx; font-weight: 700;
+}
+.lang-btn.active {
+  background: rgba(255,255,255,0.95);
+  color: #333;
 }
 
 .big-emoji {

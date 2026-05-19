@@ -2,6 +2,11 @@
 
   <!-- Coloured header band -->
   <view class="header-band" style="background:{{headerColor}};">
+    <!-- Lang toggle floats top-right -->
+    <view class="lang-row">
+      <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+      <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+    </view>
     <text class="big-emoji">{{bookEmoji}}</text>
   </view>
 
@@ -10,26 +15,23 @@
     <text class="book-title">{{bookTitle}}</text>
     <text class="book-sub">{{bookSub}}</text>
 
-    <!-- Stats row -->
     <view class="stats-row">
       <view class="stat-badge">
         <text class="stat-num">{{total}}</text>
-        <text class="stat-label">{{lang==='en'?'Questions':'道题目'}}</text>
+        <text class="stat-label">{{questionsLabel}}</text>
       </view>
       <view class="stat-badge">
         <text class="stat-num">🏆</text>
-        <text class="stat-label">{{lang==='en'?'Quiz':'问答挑战'}}</text>
+        <text class="stat-label">{{quizLabel}}</text>
       </view>
     </view>
 
-    <!-- Start button -->
     <view class="start-btn" style="background:{{headerColor}};" bindtap="startQuiz">
-      <text class="start-text">{{lang==='en'?'Start Quest  🚀':'开始冒险  🚀'}}</text>
+      <text class="start-text">{{startLabel}}</text>
     </view>
 
-    <!-- Back -->
     <view class="back-link" bindtap="goBack">
-      <text>{{lang==='en'?'← choose another':'← 返回星球'}}</text>
+      <text>{{backLabel}}</text>
     </view>
   </view>
 

@@ -1,4 +1,11 @@
 <view class="page">
+
+  <!-- Lang toggle -->
+  <view class="lang-row">
+    <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+    <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+  </view>
+
   <text class="result-emoji">{{emoji}}</text>
   <text class="result-title">{{title}}</text>
   <text class="result-score">{{scoreText}}</text>
@@ -8,4 +15,5 @@
   <text class="pct-text">{{pct}}%</text>
   <button class="btn-primary action-btn" bindtap="playAgain">{{playAgainLabel}}</button>
   <button class="btn-secondary action-btn" bindtap="goHome">{{homeLabel}}</button>
+
 </view>

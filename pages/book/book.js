@@ -81,6 +81,19 @@ Page({
     this._speak(question, lang);
   },
 
+  setLang(e) {
+    const lang = e.currentTarget.dataset.val;
+    wx.setStorageSync('lang', lang);
+    getApp().globalData.lang = lang;
+    this.setData({
+      lang,
+      replayLabel: lang === 'en' ? 'Replay'            : '重播',
+      swipeHint:   lang === 'en' ? 'swipe for choices' : '滑动查看选项',
+      nextLabel:   lang === 'en' ? 'Next'              : '下一题',
+      doneLabel:   lang === 'en' ? 'Done'              : '完成',
+    });
+  },
+
   // ── Swipe detection ──────────────────────────────────────────────
   onTouchStart(e) {
     this._touchStartX = e.touches[0].clientX;

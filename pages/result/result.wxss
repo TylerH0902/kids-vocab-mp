@@ -1,5 +1,5 @@
 .page {
-  padding: 60rpx 40rpx;
+  padding: 30rpx 40rpx 60rpx;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -7,6 +7,14 @@
   gap: 24rpx;
   background: linear-gradient(160deg, #FFF8F0 0%, #F0F8FF 100%);
 }
+
+.lang-row { display: flex; gap: 12rpx; align-self: flex-end; margin-bottom: 8rpx; }
+.lang-btn {
+  padding: 8rpx 20rpx; border-radius: 30rpx;
+  border: 2rpx solid #FF6B35; color: #FF6B35;
+  font-size: 24rpx; font-weight: 700;
+}
+.lang-btn.active { background: #FF6B35; color: #fff; }
 .result-emoji { font-size: 130rpx; line-height: 1; }
 .result-title { font-size: 52rpx; font-weight: 800; color: #FF6B35; }
 .result-score { font-size: 38rpx; color: #555; }

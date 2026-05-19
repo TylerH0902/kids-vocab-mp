@@ -4,6 +4,15 @@
   background: linear-gradient(160deg, #FFF8F0 0%, #F0F8FF 100%);
 }
 
+/* Lang toggle */
+.lang-row { display: flex; gap: 10rpx; justify-content: flex-end; margin-bottom: 10rpx; }
+.lang-btn {
+  padding: 6rpx 18rpx; border-radius: 30rpx;
+  border: 2rpx solid #FF6B35; color: #FF6B35;
+  font-size: 22rpx; font-weight: 700;
+}
+.lang-btn.active { background: #FF6B35; color: #fff; }
+
 /* Progress */
 .prog-row { display:flex; align-items:center; gap:14rpx; margin-bottom:20rpx; }
 .prog-bar-wrap { flex:1; background:#e8e8e8; border-radius:10rpx; height:16rpx; overflow:hidden; }
