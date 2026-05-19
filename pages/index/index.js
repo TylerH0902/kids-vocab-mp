@@ -3,72 +3,81 @@ const BOOKS = require('../../utils/books');
 const TWO_PI = Math.PI * 2;
 
 const ROAD = [
-  { bookIdx: 3, lat: -0.10, lon: -0.50 },
-  { bookIdx: 4, lat:  0.22, lon:  0.60 },
-  { bookIdx: 0, lat: -0.15, lon:  1.65 },
-  { bookIdx: 5, lat:  0.28, lon:  2.75 },
+  { bookIdx: 3, lat:  0.71, lon: -1.28 },  // Caterpillar — New York
+  { bookIdx: 4, lat:  0.73, lon: -1.56 },  // Wild Things  — Chicago
+  { bookIdx: 0, lat:  0.89, lon: -0.02 },  // Alice        — London
+  { bookIdx: 5, lat:  0.45, lon: -1.40 },  // Wonder       — Southern US
 ];
 const COLORS = ['#FF6B6B', '#FF9A3C', '#9B59B6', '#2979FF'];
 
-// Organic continent patches — [angle, radiusFraction] control points
-// Continent centres are intentionally offset from checkpoint positions so
-// checkpoints sit ON the landscape rather than at its centre.
+// Earth-like continent patches — [angle, radiusFraction] control points
 const TERRAIN_PATCHES = [
-  // ── Forest Continent: rounded blob with SE peninsula ─────────────
-  //    Centre offset NW; checkpoint 🐛 (lat:-0.10,lon:-0.50) sits on SE coast
-  { lat:  0.04, lon: -0.60, baseR: 0.55, fill: '#2E7D32', stroke: '#1B5E20', hi: '#66BB6A',
-    pts: [[0.00,1.00],[0.25,1.42],[0.50,0.55],[0.75,1.20],[1.05,0.78],[1.35,1.10],
-          [1.65,0.65],[1.95,1.28],[2.30,0.85],[2.65,1.05],[3.00,0.82],[3.35,1.25],
-          [3.70,0.70],[4.05,1.35],[4.40,0.65],[4.75,1.12],[5.10,0.90],[5.45,1.05]] },
-  // Forest southern archipelago
-  { lat: -0.22, lon: -0.42, baseR: 0.18, fill: '#388E3C', stroke: '#1B5E20', hi: '#81C784',
-    pts: [[0,0.85],[0.9,1.12],[1.8,0.80],[2.7,1.10],[3.6,0.82],[4.5,1.08],[5.4,0.86]] },
+  // ── North America ─────────────────────────────────────────────────
+  //    Checkpoints NY (lon:-1.28), Chicago (lon:-1.56), Southern US (lon:-1.40)
+  //    all sit within this patch
+  { lat:  0.70, lon: -1.65, baseR: 0.48, fill: '#7A9E35', stroke: '#3A5A15', hi: '#9DC048',
+    pts: [
+      [0.00,0.95],[0.30,1.28],[0.58,0.58],[0.88,1.22],[1.18,0.48],
+      [1.48,0.75],[1.78,0.62],[2.08,1.05],[2.38,1.30],[2.70,1.48],
+      [3.14,1.20],[3.60,1.45],[4.00,1.35],[4.38,1.05],[4.75,0.88],
+      [5.12,0.92],[5.50,0.95]
+    ] },
 
-  // ── Mountain Continent: jagged fjord coastline ────────────────────
-  //    Centre offset SW; checkpoint 🦁 (lat:0.22,lon:0.60) sits on NE interior
-  { lat:  0.12, lon:  0.50, baseR: 0.48, fill: '#546E7A', stroke: '#1A2C35', hi: '#90A4AE',
-    pts: [[0.00,0.90],[0.28,0.48],[0.55,1.32],[0.82,0.60],[1.10,1.18],[1.38,0.45],
-          [1.66,1.28],[1.94,0.72],[2.22,1.08],[2.55,0.58],[2.88,1.22],[3.20,0.68],
-          [3.50,1.05],[3.80,0.52],[4.10,1.25],[4.40,0.76],[4.70,1.12],[5.00,0.62],
-          [5.30,1.08],[5.60,0.90]] },
-  // Sandy highland plateau
-  { lat:  0.32, lon:  0.70, baseR: 0.20, fill: '#A1887F', stroke: '#4E342E', hi: '#BCAAA4',
-    pts: [[0,0.88],[0.8,1.12],[1.6,0.80],[2.4,1.10],[3.2,0.84],[4.0,1.08],[4.8,0.82],[5.6,0.88]] },
+  // ── South America ─────────────────────────────────────────────────
+  { lat: -0.18, lon: -1.08, baseR: 0.33, fill: '#6A9830', stroke: '#385215', hi: '#88C040',
+    pts: [
+      [0.00,0.88],[0.38,1.28],[0.72,0.90],[1.08,0.68],[1.44,0.52],
+      [1.80,0.75],[2.16,0.65],[2.55,0.72],[2.95,0.88],[3.35,1.15],
+      [3.75,1.00],[4.15,0.82],[4.55,0.92],[4.95,1.08],[5.35,0.88]
+    ] },
 
-  // ── Cave Continent: crescent shape — deep bay on east side ───────
-  //    Centre offset N; checkpoint 🐰 (lat:-0.15,lon:1.65) sits on S coast
-  { lat: -0.04, lon:  1.58, baseR: 0.42, fill: '#1A1A2E', stroke: '#0A0A14', hi: '#2D2D52',
-    pts: [[0.00,0.92],[0.30,1.22],[0.58,0.85],[0.86,1.18],[1.14,0.50],[1.42,0.36],
-          [1.70,0.52],[1.98,0.88],[2.26,0.45],[2.54,0.82],[2.82,1.15],[3.10,0.72],
-          [3.45,1.20],[3.80,0.62],[4.15,1.14],[4.50,0.78],[4.85,1.18],[5.20,0.88],
-          [5.55,0.95]] },
-  // Cave eastern shelf
-  { lat:  0.10, lon:  1.80, baseR: 0.20, fill: '#212136', stroke: '#0A0A14', hi: '#303056',
-    pts: [[0,0.88],[0.9,1.10],[1.8,0.82],[2.7,1.08],[3.6,0.84],[4.5,1.08],[5.4,0.86]] },
+  // ── Greenland (ice cap) ───────────────────────────────────────────
+  { lat:  1.10, lon: -0.72, baseR: 0.17, fill: '#C8E0F0', stroke: '#88A8C0', hi: '#E0F0F8',
+    pts: [[0,0.88],[0.8,1.15],[1.6,0.82],[2.4,1.12],[3.2,0.85],[4.0,1.15],[4.8,0.82],[5.6,0.90]] },
 
-  // ── Meadow Continent: plump, rounded, friendly ────────────────────
-  //    Centre offset SW; checkpoint ⭐ (lat:0.28,lon:2.75) sits on NE coast
-  { lat:  0.18, lon:  2.72, baseR: 0.46, fill: '#558B2F', stroke: '#1B5E20', hi: '#9CCC65',
-    pts: [[0.00,1.12],[0.35,0.80],[0.70,1.22],[1.05,0.88],[1.40,1.18],[1.75,0.82],
-          [2.10,1.15],[2.50,0.88],[2.90,1.12],[3.30,0.85],[3.70,1.18],[4.10,0.80],
-          [4.50,1.15],[4.90,0.85],[5.30,1.10]] },
+  // ── Europe (mainland) ─────────────────────────────────────────────
+  { lat:  0.82, lon:  0.20, baseR: 0.26, fill: '#7A9838', stroke: '#3A5815', hi: '#9ABE50',
+    pts: [
+      [0.00,0.88],[0.42,0.62],[0.78,1.08],[1.12,0.55],[1.48,1.18],
+      [1.82,0.72],[2.20,0.95],[2.60,1.12],[3.00,1.05],[3.40,1.28],
+      [3.80,1.42],[4.20,1.10],[4.60,0.88],[5.00,0.82],[5.40,0.88]
+    ] },
 
-  // ── Ocean atolls (small islands between continents) ───────────────
-  { lat:  0.08, lon:  0.08, baseR: 0.20, fill: '#3E6B28', stroke: '#2A4F1A', hi: '#6A9850',
-    pts: [[0,0.82],[0.9,1.10],[1.8,0.78],[2.7,1.08],[3.6,0.82],[4.5,1.08],[5.4,0.84]] },
-  { lat:  0.06, lon:  1.18, baseR: 0.18, fill: '#3A5E2A', stroke: '#263E18', hi: '#608E40',
-    pts: [[0,0.85],[1.0,1.10],[2.0,0.80],[3.0,1.08],[4.0,0.82],[5.0,1.08]] },
-  { lat:  0.12, lon:  2.24, baseR: 0.17, fill: '#3E6B28', stroke: '#2A4F1A', hi: '#6A9850',
-    pts: [[0,0.82],[1.1,1.10],[2.2,0.80],[3.3,1.08],[4.4,0.82],[5.5,1.06]] },
+  // ── Great Britain — Alice (London) checkpoint sits here ───────────
+  { lat:  0.90, lon: -0.09, baseR: 0.10, fill: '#6A9030', stroke: '#385014', hi: '#88B048',
+    pts: [
+      [0.00,0.85],[0.65,1.25],[1.30,0.82],[1.95,1.05],[2.60,0.88],
+      [3.25,1.20],[3.90,1.35],[4.55,0.95],[5.20,0.85],[5.85,0.88]
+    ] },
+
+  // ── Africa ────────────────────────────────────────────────────────
+  { lat:  0.05, lon:  0.30, baseR: 0.42, fill: '#B09030', stroke: '#6A5010', hi: '#CCB048',
+    pts: [
+      [0.00,0.98],[0.38,0.72],[0.72,1.05],[1.08,0.82],[1.44,0.70],
+      [1.80,0.95],[2.18,1.08],[2.56,1.05],[2.92,1.18],[3.28,1.25],
+      [3.64,1.05],[4.00,0.88],[4.38,0.82],[4.76,0.88],[5.14,0.82],
+      [5.52,0.92]
+    ] },
+
+  // ── Asia (partial — eastern limb) ────────────────────────────────
+  { lat:  0.55, lon:  1.30, baseR: 0.52, fill: '#7A9838', stroke: '#3A5815', hi: '#9ABE50',
+    pts: [
+      [0.00,0.80],[0.30,1.10],[0.60,0.70],[0.90,1.20],[1.20,0.88],
+      [1.50,1.15],[1.80,0.72],[2.10,1.05],[2.45,1.25],[2.80,0.90],
+      [3.14,1.10],[3.50,0.82],[3.85,1.20],[4.20,0.88],[4.55,1.05],
+      [4.90,0.78],[5.25,1.08],[5.60,0.88]
+    ] },
+
+  // ── Australia ─────────────────────────────────────────────────────
+  { lat: -0.42, lon:  2.30, baseR: 0.28, fill: '#C09A35', stroke: '#705810', hi: '#DCB850',
+    pts: [
+      [0.00,1.05],[0.40,0.70],[0.80,1.18],[1.20,0.88],[1.60,1.12],
+      [2.00,0.80],[2.45,1.15],[2.90,1.00],[3.35,1.08],[3.80,0.85],
+      [4.25,1.12],[4.70,0.90],[5.15,0.98],[5.60,1.05]
+    ] },
 ];
 
-// One illustration per biome — positioned on the continent away from the checkpoint
-const TERRAIN_ICONS = [
-  { type: 'forest',   lat:  0.10, lon: -0.72 },
-  { type: 'mountain', lat:  0.05, lon:  0.42 },
-  { type: 'cave',     lat:  0.06, lon:  1.46 },
-  { type: 'flowers',  lat:  0.10, lon:  2.60 },
-];
+const TERRAIN_ICONS = [];  // no biome icons on the Earth globe
 
 // Ocean sparkle dots at fixed lat/lon — rotate with the planet
 const OCEAN_SPARKLES = [
@@ -85,7 +94,7 @@ Page({
 
   _canvas: null, _ctx: null,
   _w: 0, _h: 0, _cx: 0, _cy: 0, _R: 0,
-  _rotY: 0.50, _rotX: 0.35,
+  _rotY: 1.00, _rotX: 0.38,
   _zoom: 1.0,
   _dragStartX: 0, _dragStartY: 0, _dragStartRot: 0, _dragStartRotX: 0, _isDragging: false,
   _lastTapTime: 0, _tapTimer: null,
