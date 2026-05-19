@@ -52,8 +52,11 @@ page { background: #080C24; }
 
 .hint {
   font-size: 24rpx;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.5);
   margin-top: 10rpx;
   text-align: center;
   letter-spacing: 1rpx;
+  transition: opacity 0.5s ease;
+  opacity: 1;
 }
+.hint-hidden { opacity: 0; }

@@ -18,6 +18,6 @@
     </view>
   </view>
 
-  <text class="hint">{{lang==='en'?'swipe to spin · tap a star to play':'左右滑动 · 点击星球探索'}}</text>
+  <text class="hint {{hintVisible?'':'hint-hidden'}}">{{hintText}}</text>
 
 </view>
