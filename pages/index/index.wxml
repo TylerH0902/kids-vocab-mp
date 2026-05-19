@@ -10,7 +10,7 @@
   </view>
 
   <!-- Book list -->
-  <view wx:for="{{books}}" wx:key="id" class="book-card" bindtap="openBook" data-id="{{item.id}}">
+  <view wx:for="{{books}}" wx:key="id" class="book-card book-card-{{index%4}}" bindtap="openBook" data-id="{{item.id}}">
     <text class="book-emoji">{{item.emoji}}</text>
     <view class="book-info">
       <text class="book-title">{{lang==='en'?item.title_en:item.title_zh}}</text>

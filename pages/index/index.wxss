@@ -1,4 +1,8 @@
-.page { padding: 24rpx 24rpx 48rpx; min-height: 100vh; }
+.page {
+  padding: 24rpx 24rpx 48rpx;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #FFF8F0 0%, #F0F8FF 100%);
+}
 
 .header-row {
   display: flex;
@@ -6,15 +10,15 @@
   justify-content: space-between;
   margin-bottom: 28rpx;
 }
-.title { font-size: 46rpx; font-weight: 800; color: #6C63FF; }
+.title { font-size: 46rpx; font-weight: 800; color: #FF6B35; }
 
 .lang-row { display: flex; gap: 12rpx; }
 .lang-btn {
   padding: 10rpx 24rpx; border-radius: 30rpx;
-  border: 2rpx solid #6C63FF; color: #6C63FF;
+  border: 2rpx solid #FF6B35; color: #FF6B35;
   font-size: 28rpx; font-weight: 700;
 }
-.lang-btn.active { background: #6C63FF; color: #fff; }
+.lang-btn.active { background: #FF6B35; color: #fff; }
 
 .book-card {
   display: flex;
@@ -23,9 +27,14 @@
   border-radius: 20rpx;
   padding: 24rpx 20rpx;
   margin-bottom: 18rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,.07);
   gap: 18rpx;
+  border-left: 10rpx solid #ccc;
 }
+.book-card-0 { border-left-color: #FF6B35; box-shadow: 0 4rpx 20rpx rgba(255,107,53,.15); }
+.book-card-1 { border-left-color: #00C896; box-shadow: 0 4rpx 20rpx rgba(0,200,150,.15); }
+.book-card-2 { border-left-color: #FFD93D; box-shadow: 0 4rpx 20rpx rgba(255,217,61,.2); }
+.book-card-3 { border-left-color: #9B59B6; box-shadow: 0 4rpx 20rpx rgba(155,89,182,.15); }
+
 .book-emoji { font-size: 60rpx; line-height: 1; flex-shrink: 0; }
 .book-info { flex: 1; min-width: 0; }
 .book-title {
@@ -34,4 +43,4 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .book-sub { display: block; font-size: 28rpx; color: #999; margin-top: 6rpx; }
-.book-arrow { font-size: 48rpx; color: #ccc; flex-shrink: 0; }
+.book-arrow { font-size: 48rpx; color: #FF6B35; flex-shrink: 0; font-weight: 700; }

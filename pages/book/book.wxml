@@ -32,7 +32,7 @@
       <view
         wx:for="{{choices}}"
         wx:key="id"
-        class="choice-block {{item.state}}"
+        class="choice-block choice-{{item.letter}} {{item.state}}"
         bindtap="onChoiceTap"
         data-id="{{item.id}}"
       >
