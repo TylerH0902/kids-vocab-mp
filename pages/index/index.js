@@ -53,7 +53,7 @@ const OCEAN_SPARKLES = [
 ];
 
 Page({
-  data: { lang: 'en', hintVisible: true, hintText: '' },
+  data: { lang: 'en', hintVisible: true, hintText: '', canvasReady: false },
 
   _canvas: null, _ctx: null,
   _w: 0, _h: 0, _cx: 0, _cy: 0, _R: 0,
@@ -86,8 +86,9 @@ Page({
         this._canvas = canvas; this._ctx = ctx;
         this._w = w; this._h = h;
         this._cx = w / 2; this._cy = h / 2;
-        this._R  = w * 0.33;
+        this._R  = w * 0.42;
         this._draw();
+        this.setData({ canvasReady: true });
       });
   },
 
@@ -421,7 +422,7 @@ Page({
 
   // ── Zoom toggle (smooth animation) ───────────────────────────────
   _toggleZoom() {
-    const target = this._zoom > 1.2 ? 1.0 : 1.7;
+    const target = this._zoom > 1.1 ? 1.0 : 1.5;
     const start  = this._zoom, t0 = Date.now(), dur = 320;
     const tick   = () => {
       const p = Math.min(1, (Date.now()-t0)/dur);
@@ -432,7 +433,7 @@ Page({
     };
     this._canvas.requestAnimationFrame(tick);
     const lang = this.data.lang;
-    const hint = target > 1.2
+    const hint = target > 1.1
       ? (lang === 'en' ? 'Double tap to zoom out' : '双击缩小')
       : (lang === 'en' ? 'Double tap to zoom in 🔍' : '双击放大 🔍');
     this.setData({ hintText: hint, hintVisible: true });

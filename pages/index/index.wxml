@@ -9,6 +9,11 @@
     bindtouchend="onTouchEnd"
   ></canvas>
 
+  <!-- CSS placeholder shown until canvas draws its first frame -->
+  <view class="planet-loader" wx:if="{{!canvasReady}}">
+    <view class="planet-loader-ball"></view>
+  </view>
+
   <!-- Header floats over planet -->
   <view class="header-overlay">
     <text class="app-title">🌟 {{lang==='en'?'Story Quest':'故事大冒险'}}</text>
