@@ -1,0 +1,114 @@
+page { background: #080C24; }
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(160deg, #0D1840 0%, #1A0A2E 100%);
+}
+
+/* Coloured top band with emoji floating over it */
+.header-band {
+  width: 100%;
+  height: 320rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0;
+  border-radius: 0 0 60% 60% / 0 0 40rpx 40rpx;
+  box-shadow: 0 8rpx 40rpx rgba(0,0,0,0.4);
+}
+
+.big-emoji {
+  font-size: 160rpx;
+  line-height: 1;
+  margin-bottom: -60rpx;  /* floats over the card */
+  filter: drop-shadow(0 8rpx 16rpx rgba(0,0,0,0.35));
+}
+
+/* Main card */
+.card {
+  width: 660rpx;
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 90rpx 44rpx 48rpx;
+  margin-top: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18rpx;
+  box-shadow: 0 12rpx 48rpx rgba(0,0,0,0.35);
+}
+
+.book-title {
+  font-size: 46rpx;
+  font-weight: 800;
+  color: #1a1a2e;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.book-sub {
+  font-size: 28rpx;
+  color: #888;
+  text-align: center;
+}
+
+/* Stats */
+.stats-row {
+  display: flex;
+  gap: 24rpx;
+  margin: 10rpx 0 4rpx;
+}
+
+.stat-badge {
+  flex: 1;
+  background: #f5f5ff;
+  border-radius: 20rpx;
+  padding: 20rpx 10rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.stat-num {
+  font-size: 52rpx;
+  font-weight: 900;
+  color: #333;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: 600;
+}
+
+/* Start button */
+.start-btn {
+  width: 100%;
+  padding: 30rpx 0;
+  border-radius: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12rpx;
+  box-shadow: 0 6rpx 24rpx rgba(0,0,0,0.2);
+}
+
+.start-text {
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 900;
+  letter-spacing: 1rpx;
+}
+
+/* Back link */
+.back-link {
+  font-size: 26rpx;
+  color: #aaa;
+  margin-top: 4rpx;
+  padding: 10rpx 20rpx;
+}

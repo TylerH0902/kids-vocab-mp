@@ -260,7 +260,7 @@ Page({
       if (d < bestDist) { bestDist = d; best = i; }
     }
     if (best >= 0) {
-      wx.navigateTo({ url: `/pages/book/book?id=${BOOKS[ROAD[best].bookIdx].id}` });
+      wx.navigateTo({ url: `/pages/intro/intro?id=${BOOKS[ROAD[best].bookIdx].id}` });
     }
   },
 

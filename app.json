@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/intro/intro",
     "pages/book/book",
     "pages/result/result",
     "pages/game/game",

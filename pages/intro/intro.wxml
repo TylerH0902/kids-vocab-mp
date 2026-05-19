@@ -1,0 +1,36 @@
+<view class="page">
+
+  <!-- Coloured header band -->
+  <view class="header-band" style="background:{{headerColor}};">
+    <text class="big-emoji">{{bookEmoji}}</text>
+  </view>
+
+  <!-- Book card -->
+  <view class="card">
+    <text class="book-title">{{bookTitle}}</text>
+    <text class="book-sub">{{bookSub}}</text>
+
+    <!-- Stats row -->
+    <view class="stats-row">
+      <view class="stat-badge">
+        <text class="stat-num">{{total}}</text>
+        <text class="stat-label">{{lang==='en'?'Questions':'道题目'}}</text>
+      </view>
+      <view class="stat-badge">
+        <text class="stat-num">🏆</text>
+        <text class="stat-label">{{lang==='en'?'Quiz':'问答挑战'}}</text>
+      </view>
+    </view>
+
+    <!-- Start button -->
+    <view class="start-btn" style="background:{{headerColor}};" bindtap="startQuiz">
+      <text class="start-text">{{lang==='en'?'Start Quest  🚀':'开始冒险  🚀'}}</text>
+    </view>
+
+    <!-- Back -->
+    <view class="back-link" bindtap="goBack">
+      <text>{{lang==='en'?'← choose another':'← 返回星球'}}</text>
+    </view>
+  </view>
+
+</view>
