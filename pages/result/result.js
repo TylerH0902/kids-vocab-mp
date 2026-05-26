@@ -1,5 +1,10 @@
 const { t }        = require('../../utils/i18n');
 const progress     = require('../../utils/progress');
+const BOOKS        = require('../../utils/books');
+
+const CHECKPOINT_IDS = new Set([
+  BOOKS[0].id, BOOKS[3].id, BOOKS[4].id, BOOKS[5].id, BOOKS[6].id, BOOKS[7].id,
+]);
 
 Page({
   data: {
@@ -7,6 +12,7 @@ Page({
     emoji: '🎉', title: '', scoreText: '', pct: 0,
     playAgainLabel: '', homeLabel: '',
     confetti: [],
+    showQuestBanner: false, questPassed: false, questBannerText: '',
   },
 
   _opts: null,
@@ -42,6 +48,19 @@ Page({
       shape: i % 3 === 0 ? 'circle' : 'square',
     }));
 
+    const mode = wx.getStorageSync('mode') || 'quest';
+    const isCheckpoint = o.gameType === 'book' && CHECKPOINT_IDS.has(o.bookId);
+    const showQuestBanner = mode === 'quest' && isCheckpoint;
+    const questPassed = pct >= 80;
+    let questBannerText = '';
+    if (showQuestBanner) {
+      questBannerText = questPassed
+        ? (lang === 'en' ? '🌟 Checkpoint cleared! Next stop unlocked!' : '🌟 关卡通过！下一站已解锁！')
+        : (lang === 'en'
+            ? `⚔️ Need 80% to unlock next stop — you got ${pct}%. Try again!`
+            : `⚔️ 需要80%解锁下一站，你得了${pct}%，再试一次！`);
+    }
+
     this.setData({
       lang,
       emoji,
@@ -51,6 +70,7 @@ Page({
       playAgainLabel: t(lang, 'playAgain'),
       homeLabel:      t(lang, 'backHome'),
       confetti,
+      showQuestBanner, questPassed, questBannerText,
     });
   },
 

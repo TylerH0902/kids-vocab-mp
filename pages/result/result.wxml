@@ -23,6 +23,11 @@
     <view class="score-bar-fill" style="width:{{pct}}%"></view>
   </view>
   <text class="pct-text">{{pct}}%</text>
+
+  <view class="quest-banner {{questPassed?'quest-pass':'quest-retry'}}" wx:if="{{showQuestBanner}}">
+    <text class="quest-banner-text">{{questBannerText}}</text>
+  </view>
+
   <button class="btn-primary action-btn" bindtap="playAgain">{{playAgainLabel}}</button>
   <button class="btn-secondary action-btn" bindtap="goHome">{{homeLabel}}</button>
 

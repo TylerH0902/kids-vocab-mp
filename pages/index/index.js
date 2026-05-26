@@ -39,7 +39,7 @@ function bezierPt(p0, cp, p1, t) {
 }
 
 Page({
-  data: { lang: 'en', hintVisible: true, hintText: '', canvasReady: false },
+  data: { lang: 'en', mode: 'quest', hintVisible: true, hintText: '', canvasReady: false },
   _engine: null,
   _config: null,
   _unlockedCount: null,   // null = not yet initialised; set on first _applyProgress
@@ -51,7 +51,8 @@ Page({
       return;
     }
     const lang = wx.getStorageSync('lang') || 'en';
-    this.setData({ lang, hintText: lang === 'en' ? 'Tap a stop to begin!' : '点击站点开始！' });
+    const mode = wx.getStorageSync('mode') || 'quest';
+    this.setData({ lang, mode, hintText: lang === 'en' ? 'Tap a stop to begin!' : '点击站点开始！' });
     setTimeout(() => this.setData({ hintVisible: false }), 4000);
   },
 
@@ -88,9 +89,10 @@ Page({
 
   onShow() {
     const lang = wx.getStorageSync('lang') || 'en';
-    if (lang !== this.data.lang) {
-      this.setData({ lang });
-      if (this._engine) {
+    const mode = wx.getStorageSync('mode') || 'quest';
+    if (lang !== this.data.lang || mode !== this.data.mode) {
+      this.setData({ lang, mode });
+      if (this._engine && lang !== this.data.lang) {
         const config = buildConfig(lang);
         config.locations.forEach(loc => { loc.onTap = (l) => this._onLocationTap(l); });
         this._config = config;
@@ -112,12 +114,11 @@ Page({
 
   _onLocationTap(loc) {
     if (loc.state === 'locked') {
-      const lang = this.data.lang;
-      wx.showToast({
-        title: lang === 'en' ? 'Finish the previous story first!' : '请先完成前一个故事！',
-        icon: 'none',
-        duration: 2000,
-      });
+      const { lang, mode } = this.data;
+      const msg = mode === 'quest'
+        ? (lang === 'en' ? 'Score 80%+ on the previous stop to unlock!' : '需在上一站得分80%以上才能解锁！')
+        : (lang === 'en' ? 'Finish the previous story first!' : '请先完成前一个故事！');
+      wx.showToast({ title: msg, icon: 'none', duration: 2200 });
       return;
     }
     const book = {
@@ -158,24 +159,26 @@ Page({
     }
   },
 
+  setMode(e) {
+    const mode = e.currentTarget.dataset.val;
+    wx.setStorageSync('mode', mode);
+    getApp().globalData.mode = mode;
+    this.setData({ mode });
+    this._applyProgress();
+  },
+
   // ── Unlock logic ──────────────────────────────────────────────────────────
 
   _getUnlockedCount() {
     if (!auth.isLoggedIn()) return 1;
-    // Walk in order — stop at first unplayed checkpoint so unlocking is strictly sequential.
-    // count starts at 1 (checkpoint 0 is always available when logged in).
+    const mode = wx.getStorageSync('mode') || 'quest';
     let count = 1;
     for (let i = 0; i < CHECKPOINT_ORDER.length; i++) {
       const p = progress.getBook(CHECKPOINT_ORDER[i].bookId);
-      if (p && p.attempts > 0) {
-        // This checkpoint is done — the next one (i+1) becomes available
-        count = i + 2;
-      } else {
-        // Gap found — stop here, everything beyond stays locked
-        break;
-      }
+      if (!p || p.attempts === 0) break;
+      if (mode === 'quest' && (p.bestScore / p.bestTotal) < 0.8) break;
+      count = i + 2;
     }
-    // Cap at total checkpoints so it never exceeds the array length
     return Math.min(count, CHECKPOINT_ORDER.length);
   },
 

@@ -17,6 +17,7 @@ const MAP_BOOKS = [
 Page({
   data: {
     lang: 'en',
+    mode: 'quest',
     nickname: '', loginBadge: '', avatarText: '', avatarUrl: '',
     totalPlayed: 0, totalCorrect: 0, avgPct: '—',
     bookRows: [],
@@ -39,6 +40,13 @@ Page({
     wx.setStorageSync('lang', lang);
     getApp().globalData.lang = lang;
     this._render(lang);
+  },
+
+  setMode(e) {
+    const mode = e.currentTarget.dataset.val;
+    wx.setStorageSync('mode', mode);
+    getApp().globalData.mode = mode;
+    this.setData({ mode });
   },
 
   _render(lang) {
@@ -81,8 +89,9 @@ Page({
       ? Math.round((totalCorrect / totalQuestions) * 100) + '%'
       : '—';
 
+    const mode = wx.getStorageSync('mode') || 'quest';
     this.setData({
-      lang, nickname, loginBadge, avatarText, avatarUrl,
+      lang, mode, nickname, loginBadge, avatarText, avatarUrl,
       totalPlayed, totalCorrect, avgPct,
       bookRows,
     });

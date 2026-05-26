@@ -19,6 +19,10 @@
         <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
         <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
       </view>
+      <view class="mode-row">
+        <view class="mode-btn {{mode==='quest'?'active':''}}" bindtap="setMode" data-val="quest">⚔️ Quest</view>
+        <view class="mode-btn {{mode==='trial'?'active':''}}" bindtap="setMode" data-val="trial">🌟 Trial</view>
+      </view>
       <view class="profile-btn" bindtap="goProfile">👤</view>
     </view>
   </view>

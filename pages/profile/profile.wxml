@@ -31,6 +31,21 @@
     </view>
   </view>
 
+  <!-- Mode selection -->
+  <view class="section-title">{{lang==='en'?'Game Mode':'游戏模式'}}</view>
+  <view class="mode-cards">
+    <view class="mode-card {{mode==='quest'?'mode-active':''}}" bindtap="setMode" data-val="quest">
+      <text class="mode-card-icon">⚔️</text>
+      <text class="mode-card-name">Quest</text>
+      <text class="mode-card-desc">{{lang==='en'?'80%+ to unlock next stop':'得80%以上才能解锁下一站'}}</text>
+    </view>
+    <view class="mode-card {{mode==='trial'?'mode-active':''}}" bindtap="setMode" data-val="trial">
+      <text class="mode-card-icon">🌟</text>
+      <text class="mode-card-name">Trial</text>
+      <text class="mode-card-desc">{{lang==='en'?'Finish to unlock next stop':'完成即可解锁下一站'}}</text>
+    </view>
+  </view>
+
   <!-- Book progress list -->
   <view class="section-title">{{lang==='en'?'Book Progress':'书籍进度'}}</view>
 

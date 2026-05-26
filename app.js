@@ -4,6 +4,7 @@ App({
   onLaunch() {
     const lang = wx.getStorageSync('lang') || 'en';
     this.globalData.lang = lang;
+    this.globalData.mode = wx.getStorageSync('mode') || 'quest';
     this.globalData.userInfo = auth.getUserProfile();
 
     // Required by __usePrivacyVersion: surface WeChat's privacy consent dialog
@@ -31,6 +32,7 @@ App({
   },
   globalData: {
     lang: 'en',
+    mode: 'quest',
     userInfo: null,
   },
 });
