@@ -5,21 +5,21 @@
     type="2d"
     class="planet-canvas"
     bindtouchstart="onTouchStart"
-    catchtouchmove="onTouchMove"
+    bindtouchmove="onTouchMove"
     bindtouchend="onTouchEnd"
   ></canvas>
 
-  <!-- CSS placeholder shown until canvas draws its first frame -->
-  <view class="planet-loader" wx:if="{{!canvasReady}}">
-    <view class="planet-loader-ball"></view>
-  </view>
+  <!-- Placeholder shown while canvas initialises — prevents black flash -->
+  <view class="map-loader" wx:if="{{!canvasReady}}"></view>
 
-  <!-- Header floats over planet -->
+  <!-- Header floats over map -->
   <view class="header-overlay">
-    <text class="app-title">🌟 {{lang==='en'?'Story Quest':'故事大冒险'}}</text>
-    <view class="lang-row">
-      <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
-      <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+    <view class="header-right">
+      <view class="lang-row">
+        <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+        <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+      </view>
+      <view class="profile-btn" bindtap="goProfile">👤</view>
     </view>
   </view>
 

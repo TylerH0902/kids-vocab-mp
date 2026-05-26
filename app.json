@@ -1,9 +1,11 @@
 {
   "pages": [
+    "pages/login/login",
     "pages/index/index",
     "pages/intro/intro",
     "pages/book/book",
     "pages/result/result",
+    "pages/profile/profile",
     "pages/game/game",
     "pages/spell/spell"
   ],

@@ -1,16 +1,21 @@
-const { t } = require('../../utils/i18n');
+const { t }        = require('../../utils/i18n');
+const progress     = require('../../utils/progress');
 
 Page({
   data: {
     lang: 'en',
     emoji: '🎉', title: '', scoreText: '', pct: 0,
     playAgainLabel: '', homeLabel: '',
+    confetti: [],
   },
 
   _opts: null,
 
   onLoad(options) {
     this._opts = options;
+    if (options.gameType === 'book' && options.bookId) {
+      progress.saveResult(options.bookId, parseInt(options.correct) || 0, parseInt(options.total) || 1);
+    }
     const lang = options.lang || wx.getStorageSync('lang') || 'en';
     this._render(lang);
   },
@@ -25,6 +30,18 @@ Page({
       ? (pct >= 60 ? 'casualDone' : 'done')
       : (o.gameMode === 'test' ? 'testDone' : 'casualDone');
 
+    const colors  = ['#FF6B35','#FFD93D','#00C896','#9B59B6','#FF4757','#2ED573','#1E90FF','#FF6B81'];
+    const count   = pct >= 80 ? 28 : 18;
+    const confetti = Array.from({ length: count }, (_, i) => ({
+      id:    i,
+      x:     Math.round(Math.random() * 94 + 2),
+      delay: +(Math.random() * 1.4).toFixed(2),
+      dur:   +(1.8 + Math.random() * 0.9).toFixed(2),
+      color: colors[i % colors.length],
+      size:  10 + Math.floor(Math.random() * 12),
+      shape: i % 3 === 0 ? 'circle' : 'square',
+    }));
+
     this.setData({
       lang,
       emoji,
@@ -33,6 +50,7 @@ Page({
       pct,
       playAgainLabel: t(lang, 'playAgain'),
       homeLabel:      t(lang, 'backHome'),
+      confetti,
     });
   },
 
@@ -55,6 +73,6 @@ Page({
   },
 
   goHome() {
-    wx.reLaunch({ url: '/pages/index/index' });
+    wx.navigateBack();
   },
 });

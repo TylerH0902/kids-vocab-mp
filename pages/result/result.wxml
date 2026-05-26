@@ -1,5 +1,15 @@
 <view class="page">
 
+  <!-- Confetti -->
+  <view class="confetti-wrap">
+    <view
+      wx:for="{{confetti}}"
+      wx:key="id"
+      class="confetto {{item.shape}}"
+      style="left:{{item.x}}%;animation-delay:{{item.delay}}s;animation-duration:{{item.dur}}s;background:{{item.color}};width:{{item.size}}rpx;height:{{item.size}}rpx"
+    ></view>
+  </view>
+
   <!-- Lang toggle -->
   <view class="lang-row">
     <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>

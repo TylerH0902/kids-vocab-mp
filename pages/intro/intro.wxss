@@ -124,6 +124,122 @@ page { background: #080C24; }
   letter-spacing: 1rpx;
 }
 
+/* Stars + best score (single book) */
+.stars-row {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  margin-bottom: 12rpx;
+}
+.star {
+  font-size: 42rpx;
+  color: #DDD;
+}
+.star.filled { color: #FFD700; }
+.best-score {
+  font-size: 24rpx;
+  color: #888;
+  margin-left: 10rpx;
+}
+
+/* Chapter picker (series books like Alice) */
+.chapter-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin: 8rpx 0 16rpx;
+}
+
+.chapter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f5f5ff;
+  border-radius: 20rpx;
+  padding: 28rpx 28rpx 28rpx 24rpx;
+  border-left: 8rpx solid #6C63FF;
+}
+
+.chapter-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  flex: 1;
+}
+
+.chapter-sub {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.ch-meta {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.chapter-count {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.ch-stars {
+  display: flex;
+  align-items: center;
+  gap: 2rpx;
+}
+
+.ch-star {
+  font-size: 28rpx;
+  color: #DDD;
+}
+
+.ch-star.filled { color: #FFD700; }
+
+.ch-best {
+  font-size: 20rpx;
+  color: #aaa;
+  margin-left: 6rpx;
+}
+
+.chapter-arrow {
+  font-size: 48rpx;
+  color: #bbb;
+  font-weight: 300;
+}
+
+/* New-content banner */
+.new-banner {
+  width: 100%;
+  background: linear-gradient(90deg, #FF4757, #FF6B35);
+  border-radius: 16rpx;
+  padding: 18rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.new-banner-text {
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Chapter new-count badge */
+.ch-new-badge {
+  background: #FF4757;
+  border-radius: 20rpx;
+  padding: 4rpx 14rpx;
+  margin-right: 10rpx;
+}
+.ch-new-text {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
 /* Back link */
 .back-link {
   font-size: 26rpx;

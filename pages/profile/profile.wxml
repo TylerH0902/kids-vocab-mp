@@ -1,0 +1,69 @@
+<view class="page">
+
+  <!-- Header -->
+  <view class="header">
+    <view class="lang-row">
+      <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+      <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+    </view>
+
+    <view class="avatar-wrap">
+      <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill" />
+      <text wx:else class="avatar-letter">{{avatarText}}</text>
+    </view>
+    <text class="nickname">{{nickname}}</text>
+    <view class="login-badge">{{loginBadge}}</view>
+  </view>
+
+  <!-- Summary stats -->
+  <view class="summary-row">
+    <view class="summary-card">
+      <text class="summary-num">{{totalPlayed}}</text>
+      <text class="summary-label">{{lang==='en'?'Books Played':'已完成书籍'}}</text>
+    </view>
+    <view class="summary-card">
+      <text class="summary-num">{{totalCorrect}}</text>
+      <text class="summary-label">{{lang==='en'?'Best Correct':'最佳答对数'}}</text>
+    </view>
+    <view class="summary-card">
+      <text class="summary-num">{{avgPct}}</text>
+      <text class="summary-label">{{lang==='en'?'Avg Score':'平均得分'}}</text>
+    </view>
+  </view>
+
+  <!-- Book progress list -->
+  <view class="section-title">{{lang==='en'?'Book Progress':'书籍进度'}}</view>
+
+  <view class="book-list">
+    <view wx:for="{{bookRows}}" wx:key="id" class="book-row {{item.played?'':'unplayed'}}">
+
+      <text class="book-emoji">{{item.emoji}}</text>
+
+      <view class="book-info">
+        <text class="book-title">{{item.title}}</text>
+        <text class="book-sub">{{item.sub}}</text>
+        <view class="stars-row" wx:if="{{item.played}}">
+          <text class="star {{item.stars>0?'filled':''}}">★</text>
+          <text class="star {{item.stars>1?'filled':''}}">★</text>
+          <text class="star {{item.stars>2?'filled':''}}">★</text>
+          <text class="pct-text">{{item.pct}}</text>
+        </view>
+      </view>
+
+      <view class="book-right" wx:if="{{item.played}}">
+        <text class="score-big">{{item.bestScore}}/{{item.bestTotal}}</text>
+        <text class="attempts">{{item.attempts}}×</text>
+      </view>
+      <view class="book-right" wx:else>
+        <text class="not-played">{{lang==='en'?'Not yet':'未开始'}}</text>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- Logout -->
+  <view class="logout-btn" bindtap="logout">
+    {{lang==='en'?'Log out':'退出登录'}}
+  </view>
+
+</view>

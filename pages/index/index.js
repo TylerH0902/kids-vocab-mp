@@ -1,110 +1,54 @@
-const BOOKS = require('../../utils/books');
+const BOOKS    = require('../../utils/books');
+const auth     = require('../../utils/auth');
+const progress = require('../../utils/progress');
+const { MapEngine }   = require('../../utils/mapEngine/MapEngine');
+const { buildConfig } = require('./mapConfig');
 
-const TWO_PI = Math.PI * 2;
-
-const ROAD = [
-  { bookIdx: 3, lat:  0.71, lon: -1.28 },  // Caterpillar — New York
-  { bookIdx: 4, lat:  0.73, lon: -1.56 },  // Wild Things  — Chicago
-  { bookIdx: 0, lat:  0.89, lon: -0.02 },  // Alice        — London
-  { bookIdx: 5, lat:  0.45, lon: -1.40 },  // Wonder       — Southern US
-];
-const COLORS = ['#FF6B6B', '#FF9A3C', '#9B59B6', '#2979FF'];
-
-// Earth-like continent patches — [angle, radiusFraction] control points
-const TERRAIN_PATCHES = [
-  // ── North America ─────────────────────────────────────────────────
-  //    Checkpoints NY (lon:-1.28), Chicago (lon:-1.56), Southern US (lon:-1.40)
-  //    all sit within this patch
-  { lat:  0.70, lon: -1.65, baseR: 0.48, fill: '#7A9E35', stroke: '#3A5A15', hi: '#9DC048',
-    pts: [
-      [0.00,0.95],[0.30,1.28],[0.58,0.58],[0.88,1.22],[1.18,0.48],
-      [1.48,0.75],[1.78,0.62],[2.08,1.05],[2.38,1.30],[2.70,1.48],
-      [3.14,1.20],[3.60,1.45],[4.00,1.35],[4.38,1.05],[4.75,0.88],
-      [5.12,0.92],[5.50,0.95]
-    ] },
-
-  // ── South America ─────────────────────────────────────────────────
-  { lat: -0.18, lon: -1.08, baseR: 0.33, fill: '#6A9830', stroke: '#385215', hi: '#88C040',
-    pts: [
-      [0.00,0.88],[0.38,1.28],[0.72,0.90],[1.08,0.68],[1.44,0.52],
-      [1.80,0.75],[2.16,0.65],[2.55,0.72],[2.95,0.88],[3.35,1.15],
-      [3.75,1.00],[4.15,0.82],[4.55,0.92],[4.95,1.08],[5.35,0.88]
-    ] },
-
-  // ── Greenland (ice cap) ───────────────────────────────────────────
-  { lat:  1.10, lon: -0.72, baseR: 0.17, fill: '#C8E0F0', stroke: '#88A8C0', hi: '#E0F0F8',
-    pts: [[0,0.88],[0.8,1.15],[1.6,0.82],[2.4,1.12],[3.2,0.85],[4.0,1.15],[4.8,0.82],[5.6,0.90]] },
-
-  // ── Europe (mainland) ─────────────────────────────────────────────
-  { lat:  0.82, lon:  0.20, baseR: 0.26, fill: '#7A9838', stroke: '#3A5815', hi: '#9ABE50',
-    pts: [
-      [0.00,0.88],[0.42,0.62],[0.78,1.08],[1.12,0.55],[1.48,1.18],
-      [1.82,0.72],[2.20,0.95],[2.60,1.12],[3.00,1.05],[3.40,1.28],
-      [3.80,1.42],[4.20,1.10],[4.60,0.88],[5.00,0.82],[5.40,0.88]
-    ] },
-
-  // ── Great Britain — Alice (London) checkpoint sits here ───────────
-  { lat:  0.90, lon: -0.09, baseR: 0.10, fill: '#6A9030', stroke: '#385014', hi: '#88B048',
-    pts: [
-      [0.00,0.85],[0.65,1.25],[1.30,0.82],[1.95,1.05],[2.60,0.88],
-      [3.25,1.20],[3.90,1.35],[4.55,0.95],[5.20,0.85],[5.85,0.88]
-    ] },
-
-  // ── Africa ────────────────────────────────────────────────────────
-  { lat:  0.05, lon:  0.30, baseR: 0.42, fill: '#B09030', stroke: '#6A5010', hi: '#CCB048',
-    pts: [
-      [0.00,0.98],[0.38,0.72],[0.72,1.05],[1.08,0.82],[1.44,0.70],
-      [1.80,0.95],[2.18,1.08],[2.56,1.05],[2.92,1.18],[3.28,1.25],
-      [3.64,1.05],[4.00,0.88],[4.38,0.82],[4.76,0.88],[5.14,0.82],
-      [5.52,0.92]
-    ] },
-
-  // ── Asia (partial — eastern limb) ────────────────────────────────
-  { lat:  0.55, lon:  1.30, baseR: 0.52, fill: '#7A9838', stroke: '#3A5815', hi: '#9ABE50',
-    pts: [
-      [0.00,0.80],[0.30,1.10],[0.60,0.70],[0.90,1.20],[1.20,0.88],
-      [1.50,1.15],[1.80,0.72],[2.10,1.05],[2.45,1.25],[2.80,0.90],
-      [3.14,1.10],[3.50,0.82],[3.85,1.20],[4.20,0.88],[4.55,1.05],
-      [4.90,0.78],[5.25,1.08],[5.60,0.88]
-    ] },
-
-  // ── Australia ─────────────────────────────────────────────────────
-  { lat: -0.42, lon:  2.30, baseR: 0.28, fill: '#C09A35', stroke: '#705810', hi: '#DCB850',
-    pts: [
-      [0.00,1.05],[0.40,0.70],[0.80,1.18],[1.20,0.88],[1.60,1.12],
-      [2.00,0.80],[2.45,1.15],[2.90,1.00],[3.35,1.08],[3.80,0.85],
-      [4.25,1.12],[4.70,0.90],[5.15,0.98],[5.60,1.05]
-    ] },
+// Ordered unlock sequence — completing index N unlocks index N+1
+const CHECKPOINT_ORDER = [
+  { locId: 'caterpillar_glen', bookId: BOOKS[3].id },
+  { locId: 'wild_wood',        bookId: BOOKS[4].id },
+  { locId: 'wonder_castle',    bookId: BOOKS[0].id },
+  { locId: 'charlottes_barn',  bookId: BOOKS[6].id },
+  { locId: 'story_school',     bookId: BOOKS[5].id },
 ];
 
-const TERRAIN_ICONS = [];  // no biome icons on the Earth globe
-
-// Ocean sparkle dots at fixed lat/lon — rotate with the planet
-const OCEAN_SPARKLES = [
-  [-0.10, 0.20], [ 0.35,-0.80], [-0.50, 0.40], [ 0.15, 1.30], [-0.30, 2.10],
-  [ 0.55, 3.20], [-0.20, 3.80], [ 0.10, 4.50], [-0.45, 5.20], [ 0.38, 5.80],
-  [ 0.60, 0.90], [-0.65, 1.60], [ 0.25,-0.30], [-0.15, 2.70], [ 0.50, 4.10],
-  [-0.38, 3.50], [ 0.08, 5.50], [-0.55, 4.80], [ 0.42, 2.00], [-0.22, 0.70],
-  [ 0.70,-0.50], [-0.72, 2.80], [ 0.18, 3.40], [-0.48, 5.90], [ 0.35, 1.80],
-  [-0.05, 4.30], [ 0.62, 1.50], [-0.35, 0.10], [ 0.28,-0.60], [-0.60, 3.20],
+// Bezier path segments connecting each checkpoint pair (matches mapConfig drawFn)
+const PATH_SEGMENTS = [
+  { p0:{x:.21,y:.72}, cp:{x:.08,y:.53}, p1:{x:.20,y:.34} },
+  { p0:{x:.20,y:.34}, cp:{x:.50,y:.08}, p1:{x:.78,y:.32} },
+  { p0:{x:.78,y:.32}, cp:{x:.72,y:.28}, p1:{x:.58,y:.56} },
+  { p0:{x:.58,y:.56}, cp:{x:.62,y:.72}, p1:{x:.80,y:.74} },
 ];
+
+// Maps each location's contentRef to its primary book ID
+const CONTENT_BOOK = {
+  book_0: BOOKS[0].id,
+  book_3: BOOKS[3].id,
+  book_4: BOOKS[4].id,
+  book_5: BOOKS[5].id,
+  book_6: BOOKS[6].id,
+};
+
+function bezierPt(p0, cp, p1, t) {
+  const u = 1 - t;
+  return { x: u*u*p0.x + 2*u*t*cp.x + t*t*p1.x, y: u*u*p0.y + 2*u*t*cp.y + t*t*p1.y };
+}
 
 Page({
   data: { lang: 'en', hintVisible: true, hintText: '', canvasReady: false },
-
-  _canvas: null, _ctx: null,
-  _w: 0, _h: 0, _cx: 0, _cy: 0, _R: 0,
-  _rotY: 1.00, _rotX: 0.38,
-  _zoom: 1.0,
-  _dragStartX: 0, _dragStartY: 0, _dragStartRot: 0, _dragStartRotX: 0, _isDragging: false,
-  _lastTapTime: 0, _tapTimer: null,
+  _engine: null,
+  _config: null,
+  _unlockedCount: null,   // null = not yet initialised; set on first _applyProgress
+  _touchStartX: 0, _touchStartY: 0, _touchMoved: false,
 
   onLoad() {
+    if (!auth.isLoggedIn()) {
+      wx.reLaunch({ url: '/pages/login/login' });
+      return;
+    }
     const lang = wx.getStorageSync('lang') || 'en';
-    const hint = lang === 'en'
-      ? '← swipe to spin  ·  tap a stop to play →'
-      : '← 左右滑动  ·  点击站点出发 →';
-    this.setData({ lang, hintText: hint });
+    this.setData({ lang, hintText: lang === 'en' ? 'Tap a stop to begin!' : '点击站点开始！' });
     setTimeout(() => this.setData({ hintVisible: false }), 4000);
   },
 
@@ -112,428 +56,90 @@ Page({
     wx.createSelectorQuery()
       .select('#planet-canvas')
       .fields({ node: true, size: true })
-      .exec(res => {
-        const canvas = res[0].node;
-        const ctx    = canvas.getContext('2d');
-        const dpr    = wx.getSystemInfoSync().pixelRatio;
-        const w = res[0].width, h = res[0].height;
-        canvas.width  = w * dpr;
-        canvas.height = h * dpr;
-        ctx.scale(dpr, dpr);
-        this._canvas = canvas; this._ctx = ctx;
-        this._w = w; this._h = h;
-        this._cx = w / 2; this._cy = h / 2;
-        this._R  = w * 0.42;
-        this._draw();
+      .exec(async (res) => {
+        const { node: canvas, width, height } = res[0];
+        const lang = this.data.lang;
+        const config = buildConfig(lang);
+
+        config.locations.forEach(loc => {
+          loc.onTap = (tappedLoc) => this._onLocationTap(tappedLoc);
+        });
+
+        this._config = config;
+
+        // Set correct unlock states before engine starts — prevents locked flash
+        const initCount = this._getUnlockedCount();
+        this._unlockedCount = initCount;
+        this._setLocationStates(initCount);
+
+        this._engine = new MapEngine(canvas, config);
+        await this._engine.init(width, height);
+        this._applyProgress();
         this.setData({ canvasReady: true });
       });
   },
 
+  onHide() {
+    this._engine && this._engine.pause();
+  },
+
   onShow() {
     const lang = wx.getStorageSync('lang') || 'en';
-    this.setData({ lang });
-    if (this._ctx) this._draw();
-  },
-
-  _project(lat, lon) {
-    const R  = this._R * this._zoom;
-    const cx = this._cx, cy = this._cy;
-    const x0 = R * Math.cos(lat) * Math.sin(lon);
-    const y0 = R * Math.sin(lat);
-    const z0 = R * Math.cos(lat) * Math.cos(lon);
-    const cosR = Math.cos(this._rotY), sinR = Math.sin(this._rotY);
-    const x1 =  x0 * cosR + z0 * sinR;
-    const z1 = -x0 * sinR + z0 * cosR;
-    const cosX = Math.cos(this._rotX), sinX = Math.sin(this._rotX);
-    const y2 = y0 * cosX - z1 * sinX;
-    const z2 = y0 * sinX + z1 * cosX;
-    const fov   = R * 3.2;
-    const scale = fov / (fov + z2);
-    return { sx: cx + x1 * scale, sy: cy - y2 * scale, z: z2, scale, visible: z2 > -R * 0.1 };
-  },
-
-  _draw() {
-    const { _ctx: ctx, _w: w, _h: h, _cx: cx, _cy: cy } = this;
-    const R = this._R * this._zoom;
-    ctx.clearRect(0, 0, w, h);
-
-    const bg = ctx.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, '#080C24'); bg.addColorStop(1, '#0D1840');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
-    this._drawStars(ctx, w, h);
-
-    // Solid ocean — stays visibly blue all the way to the edge
-    const ocean = ctx.createRadialGradient(cx-R*0.28, cy-R*0.30, R*0.05, cx, cy, R);
-    ocean.addColorStop(0, '#7DD4F0');
-    ocean.addColorStop(0.5, '#3FA8DC');
-    ocean.addColorStop(1, '#1A7BB8');
-    ctx.fillStyle = ocean;
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.fill();
-
-    // Ocean sparkle texture
-    this._drawOceanSparkles(ctx, cx, cy, R);
-
-    // Terrain patches clipped to sphere
-    ctx.save();
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.clip();
-    this._drawTerrainPatches(ctx, R);
-    ctx.restore();
-
-    // Subtle top-left highlight (not glassy)
-    const shine = ctx.createRadialGradient(cx-R*0.35, cy-R*0.38, 0, cx-R*0.20, cy-R*0.22, R*0.45);
-    shine.addColorStop(0, 'rgba(255,255,255,0.18)');
-    shine.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = shine;
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.fill();
-
-    // Dark cartoon border
-    ctx.strokeStyle = '#1A1A2E';
-    ctx.lineWidth = R * 0.022;
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TWO_PI); ctx.stroke();
-
-    this._drawTerrainIcons(ctx, R);
-    this._drawRoad(ctx, R);
-
-    const pts = ROAD.map((s, i) => ({
-      ...this._project(s.lat, s.lon),
-      book: BOOKS[s.bookIdx], color: COLORS[i], roadIdx: i,
-    })).sort((a, b) => a.z - b.z);
-    for (const pt of pts) this._drawCheckpoint(ctx, pt, R);
-  },
-
-  // ── Ocean sparkle dots (3D lat/lon — rotate with planet) ─────────
-  _drawOceanSparkles(ctx, cx, cy, R) {
-    for (const [lat, lon] of OCEAN_SPARKLES) {
-      const pt = this._project(lat, lon);
-      if (!pt.visible) continue;
-      const alpha = Math.max(0, Math.min(0.7, (pt.z + R) / (R * 1.5)));
-      ctx.globalAlpha = alpha * 0.7;
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(pt.sx, pt.sy, 1.6, 0, TWO_PI); ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  },
-
-  // ── Organic continent patches ──────────────────────────────────────
-  _drawTerrainPatches(ctx, R) {
-    for (const patch of TERRAIN_PATCHES) {
-      const pt = this._project(patch.lat, patch.lon);
-      if (!pt.visible) continue;
-      const r = patch.baseR * R * pt.scale;
-      const alpha = Math.max(0, Math.min(0.95, (pt.z + R) / (R * 1.5)));
-
-      // Screen-space polygon points from control angles
-      const sp = patch.pts.map(([a, rf]) => [
-        pt.sx + Math.cos(a) * r * rf,
-        pt.sy + Math.sin(a) * r * rf,
-      ]);
-      const n = sp.length;
-
-      // Smooth bezier through midpoints
-      ctx.beginPath();
-      const fm = [(sp[0][0]+sp[n-1][0])/2, (sp[0][1]+sp[n-1][1])/2];
-      ctx.moveTo(fm[0], fm[1]);
-      for (let i = 0; i < n; i++) {
-        const [x1,y1] = sp[i];
-        const [x2,y2] = sp[(i+1)%n];
-        ctx.quadraticCurveTo(x1, y1, (x1+x2)/2, (y1+y2)/2);
-      }
-      ctx.closePath();
-
-      const grad = ctx.createRadialGradient(pt.sx-r*0.2, pt.sy-r*0.2, 0, pt.sx, pt.sy, r*1.1);
-      grad.addColorStop(0, patch.hi);
-      grad.addColorStop(0.55, patch.fill);
-      grad.addColorStop(1, patch.stroke);
-
-      // Soft shadow under continent
-      ctx.save();
-      ctx.globalAlpha = alpha * 0.35;
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.translate(R * 0.008, R * 0.010);
-      ctx.fill();
-      ctx.restore();
-
-      // Continent fill + thick cartoon outline
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = grad; ctx.fill();
-      ctx.strokeStyle = '#1A1A2E';
-      ctx.lineWidth = Math.max(2.5, R * 0.020 * pt.scale);
-      ctx.lineJoin = 'round';
-      ctx.stroke();
-      ctx.restore();
-    }
-  },
-
-  // ── Terrain icons (depth-sorted) ──────────────────────────────────
-  _drawTerrainIcons(ctx, R) {
-    const sorted = TERRAIN_ICONS.map(ic => ({ ...ic, ...this._project(ic.lat, ic.lon) }))
-      .sort((a, b) => a.z - b.z);
-    for (const ic of sorted) {
-      if (!ic.visible) continue;
-      const alpha = Math.max(0.2, Math.min(1, (ic.z + R) / (R * 1.2)));
-      const s = R * 0.22 * ic.scale;
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      if      (ic.type === 'forest')   this._drawForest(ctx, ic.sx, ic.sy, s);
-      else if (ic.type === 'mountain') this._drawMountainRange(ctx, ic.sx, ic.sy, s);
-      else if (ic.type === 'cave')     this._drawCaveEntrance(ctx, ic.sx, ic.sy, s);
-      else if (ic.type === 'flowers')  this._drawFlowers(ctx, ic.sx, ic.sy, s);
-      ctx.restore();
-    }
-  },
-
-  // ── Forest: 5 layered pine trees ──────────────────────────────────
-  _drawForest(ctx, x, y, s) {
-    // [dx_fraction, height_scale, isBack]
-    const trees = [
-      [-1.48, 0.60, true], [-1.15, 0.72, true], [0.82, 0.68, true],
-      [-0.38, 1.00, false], [1.18, 0.80, false],
-    ];
-    for (const back of [true, false]) {
-      for (const [df, hs, isBack] of trees) {
-        if (isBack !== back) continue;
-        const tx = x + s*df;
-        const h  = s * 1.9 * hs;
-        const hw = s * 0.65 * hs;
-        ctx.fillStyle = isBack ? '#3E2010' : '#5C3317';
-        ctx.fillRect(tx - hw*0.12, y + s*0.02, hw*0.24, s*0.38*hs);
-        ctx.fillStyle = isBack ? '#1A4A1A' : '#1B5E20';
-        ctx.beginPath(); ctx.moveTo(tx, y-h*0.50); ctx.lineTo(tx-hw, y+s*0.05); ctx.lineTo(tx+hw, y+s*0.05); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = isBack ? '#256025' : '#2E7D32';
-        ctx.beginPath(); ctx.moveTo(tx, y-h*0.78); ctx.lineTo(tx-hw*0.75, y-h*0.28); ctx.lineTo(tx+hw*0.75, y-h*0.28); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = isBack ? '#307030' : '#388E3C';
-        ctx.beginPath(); ctx.moveTo(tx, y-h); ctx.lineTo(tx-hw*0.48, y-h*0.62); ctx.lineTo(tx+hw*0.48, y-h*0.62); ctx.closePath(); ctx.fill();
+    if (lang !== this.data.lang) {
+      this.setData({ lang });
+      if (this._engine) {
+        const config = buildConfig(lang);
+        config.locations.forEach(loc => { loc.onTap = (l) => this._onLocationTap(l); });
+        this._config = config;
       }
     }
+    this._applyProgress();
+    this._engine && this._engine.resume();
   },
 
-  // ── Mountain range: 3 peaks with snow and shadow ──────────────────
-  _drawMountainRange(ctx, x, y, s) {
-    const peaks = [
-      { dx: -s*1.05, h: 1.35, w: 0.88 },
-      { dx:  s*0.15, h: 2.05, w: 1.02 },
-      { dx:  s*1.22, h: 1.65, w: 0.92 },
-    ];
-    // Bodies
-    for (const p of peaks) {
-      const px = x+p.dx, ph = s*p.h, pw = s*p.w;
-      ctx.fillStyle = '#546E7A';
-      ctx.beginPath(); ctx.moveTo(px, y-ph); ctx.lineTo(px-pw, y+s*0.28); ctx.lineTo(px+pw, y+s*0.28); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#455A64';
-      ctx.beginPath(); ctx.moveTo(px, y-ph); ctx.lineTo(px-pw*0.14, y-ph*0.52); ctx.lineTo(px-pw, y+s*0.28); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = '#37474F'; ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.moveTo(px+pw*0.2, y-ph*0.38); ctx.lineTo(px+pw*0.44, y+s*0.12); ctx.stroke();
+  onUnload() {
+    this._engine && this._engine.destroy();
+  },
+
+  goProfile() {
+    wx.navigateTo({ url: '/pages/profile/profile' });
+  },
+
+  // ── Location tap ──────────────────────────────────────────────────────────
+
+  _onLocationTap(loc) {
+    if (loc.state === 'locked') {
+      const lang = this.data.lang;
+      wx.showToast({
+        title: lang === 'en' ? 'Finish the previous story first!' : '请先完成前一个故事！',
+        icon: 'none',
+        duration: 2000,
+      });
+      return;
     }
-    // Snow caps
-    for (const p of peaks) {
-      const px = x+p.dx, ph = s*p.h, sw = s*p.w*0.38;
-      ctx.fillStyle = '#ECEFF1';
-      ctx.beginPath(); ctx.moveTo(px, y-ph); ctx.lineTo(px-sw, y-ph*0.71); ctx.lineTo(px+sw*0.88, y-ph*0.67); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#CFD8DC';
-      ctx.beginPath(); ctx.moveTo(px, y-ph); ctx.lineTo(px-sw*0.12, y-ph*0.79); ctx.lineTo(px-sw, y-ph*0.71); ctx.closePath(); ctx.fill();
-    }
+    const book = {
+      book_0: BOOKS[0], book_3: BOOKS[3],
+      book_4: BOOKS[4], book_5: BOOKS[5],
+      book_6: BOOKS[6],
+    }[loc.contentRef];
+    if (book) wx.navigateTo({ url: `/pages/intro/intro?id=${book.id}` });
   },
 
-  // ── Cave entrance with arch, stalactites, glowing eyes ────────────
-  _drawCaveEntrance(ctx, x, y, s) {
-    const aw = s*1.30, ah = s*1.05;
-    // Rock arch
-    ctx.fillStyle = '#37474F';
-    ctx.beginPath();
-    ctx.moveTo(x-aw*1.12, y+s*0.18); ctx.lineTo(x-aw*1.12, y-s*0.08);
-    ctx.quadraticCurveTo(x-aw, y-ah*0.60, x-aw*0.42, y-ah);
-    ctx.quadraticCurveTo(x,    y-ah*1.08,  x+aw*0.42, y-ah);
-    ctx.quadraticCurveTo(x+aw, y-ah*0.60, x+aw*1.12, y-s*0.08);
-    ctx.lineTo(x+aw*1.12, y+s*0.18); ctx.closePath(); ctx.fill();
-    // Left shadow
-    ctx.fillStyle = '#263238';
-    ctx.beginPath();
-    ctx.moveTo(x-aw*1.12, y+s*0.18); ctx.lineTo(x-aw*1.12, y-s*0.08);
-    ctx.quadraticCurveTo(x-aw, y-ah*0.50, x-aw*0.70, y-ah*0.70);
-    ctx.lineTo(x-aw*0.62, y+s*0.18); ctx.closePath(); ctx.fill();
-    // Cave darkness
-    ctx.fillStyle = '#050510';
-    ctx.beginPath(); this._ell(ctx, x, y-ah*0.32, aw*0.62, ah*0.66, 0); ctx.fill();
-    // Stalactites
-    ctx.fillStyle = '#546E7A';
-    [[-aw*0.34, ah*0.80], [0, ah*0.87], [aw*0.32, ah*0.79]].forEach(([dx, topY]) => {
-      const ty = y-topY, tl = s*0.22;
-      ctx.beginPath(); ctx.moveTo(x+dx-s*0.07, ty); ctx.lineTo(x+dx+s*0.07, ty); ctx.lineTo(x+dx, ty+tl); ctx.closePath(); ctx.fill();
-    });
-    // Glowing eyes inside cave
-    ctx.fillStyle = 'rgba(255,210,0,0.75)';
-    ctx.beginPath(); this._ell(ctx, x-ah*0.13, y-ah*0.26, s*0.07, s*0.05, 0); ctx.fill();
-    ctx.beginPath(); this._ell(ctx, x+ah*0.13, y-ah*0.26, s*0.07, s*0.05, 0); ctx.fill();
-  },
+  // ── Touch handlers ────────────────────────────────────────────────────────
 
-  // ── Meadow: grass + 3 flowers with petals ─────────────────────────
-  _drawFlowers(ctx, x, y, s) {
-    // Grass patch
-    ctx.fillStyle = '#66BB6A';
-    ctx.beginPath(); this._ell(ctx, x, y+s*0.08, s*1.55, s*0.38, 0); ctx.fill();
-    // Grass blades
-    ctx.strokeStyle = '#43A047'; ctx.lineWidth = 1.2;
-    [[-s*1.0,0],[- s*0.48,-s*0.04],[s*0.08,0],[s*0.62,-s*0.03],[s*1.12,s*0.02]].forEach(([bx,by]) => {
-      ctx.beginPath(); ctx.moveTo(x+bx, y+by);
-      ctx.quadraticCurveTo(x+bx+s*0.14, y+by-s*0.32, x+bx+s*0.06, y+by-s*0.52);
-      ctx.stroke();
-    });
-    // Flowers
-    [{ dx:-s*0.92, pCol:'#FF8A80', cCol:'#FF5252', n:5 },
-     { dx: s*0.18, pCol:'#FFD740', cCol:'#FFAB00', n:6 },
-     { dx: s*1.08, pCol:'#EA80FC', cCol:'#AA00FF', n:5 }].forEach(({ dx, pCol, cCol, n }) => {
-      const fx = x+dx, fy = y-s*0.22;
-      const pr = s*0.20, or = pr*1.45;
-      // Stem
-      ctx.strokeStyle = '#2E7D32'; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.moveTo(fx, fy+pr); ctx.lineTo(fx, y+s*0.08); ctx.stroke();
-      // Petals
-      ctx.fillStyle = pCol;
-      for (let i = 0; i < n; i++) {
-        const a = (i/n)*TWO_PI;
-        ctx.beginPath(); this._ell(ctx, fx+Math.cos(a)*or, fy+Math.sin(a)*or, pr*0.88, pr*0.52, a); ctx.fill();
-      }
-      // Centre
-      ctx.fillStyle = '#FFF9C4'; ctx.beginPath(); ctx.arc(fx, fy, pr*0.54, 0, TWO_PI); ctx.fill();
-      ctx.fillStyle = cCol;    ctx.beginPath(); ctx.arc(fx, fy, pr*0.26, 0, TWO_PI); ctx.fill();
-    });
-  },
-
-  // ctx.ellipse() polyfill (not in WeChat Canvas 2D)
-  _ell(ctx, x, y, rx, ry, rot) {
-    ctx.save();
-    ctx.translate(x, y);
-    if (rot) ctx.rotate(rot);
-    ctx.scale(rx, ry);
-    ctx.arc(0, 0, 1, 0, TWO_PI);
-    ctx.restore();
-  },
-
-  // ── Road ──────────────────────────────────────────────────────────
-  _drawRoad(ctx, R) {
-    const n = ROAD.length;
-    for (let i = 0; i < n - 1; i++) {
-      const a = ROAD[i], b = ROAD[i+1];
-      let lonA = a.lon, lonB = b.lon;
-      if (lonB - lonA >  Math.PI) lonA += TWO_PI;
-      if (lonA - lonB >  Math.PI) lonB += TWO_PI;
-      for (let s = 0; s <= 18; s++) {
-        const t  = s / 18;
-        const pt = this._project(a.lat+(b.lat-a.lat)*t, lonA+(lonB-lonA)*t);
-        const al = Math.max(0.08, Math.min(0.7, (pt.z+R)/(2*R)));
-        ctx.fillStyle = `rgba(255,215,0,${al})`;
-        ctx.beginPath(); ctx.arc(pt.sx, pt.sy, 3, 0, TWO_PI); ctx.fill();
-      }
-      const ptA = this._project(a.lat+(b.lat-a.lat)*0.55, lonA+(lonB-lonA)*0.55);
-      const ptB = this._project(a.lat+(b.lat-a.lat)*0.63, lonA+(lonB-lonA)*0.63);
-      const al  = Math.max(0.1, Math.min(0.9, (ptA.z+R)/(R*1.5)));
-      const ang = Math.atan2(ptB.sy-ptA.sy, ptB.sx-ptA.sx);
-      const sz  = 9 * Math.max(0.5, ptA.scale);
-      ctx.save();
-      ctx.globalAlpha = al; ctx.fillStyle = '#FFD93D';
-      ctx.translate(ptA.sx, ptA.sy); ctx.rotate(ang);
-      ctx.beginPath(); ctx.moveTo(sz,0); ctx.lineTo(-sz*0.6,sz*0.55); ctx.lineTo(-sz*0.6,-sz*0.55); ctx.closePath(); ctx.fill();
-      ctx.restore();
-    }
-  },
-
-  // ── Checkpoint circles ────────────────────────────────────────────
-  _drawCheckpoint(ctx, { sx, sy, z, scale, visible, book, color }, R) {
-    const size  = R * 0.21 * Math.max(0.55, scale);
-    const alpha = visible ? Math.max(0.3, Math.min(1, (z+R)/(R*1.1))) : 0.25;
-    ctx.globalAlpha = alpha;
-    if (z > R*0.1) {
-      ctx.fillStyle = color + '44';
-      ctx.beginPath(); ctx.arc(sx, sy, size*1.6, 0, TWO_PI); ctx.fill();
-    }
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.arc(sx, sy, size, 0, TWO_PI); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2.5; ctx.stroke();
-    ctx.font = `${Math.round(size*1.05)}px sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
-    ctx.fillText(book.emoji, sx, sy);
-    ctx.globalAlpha = 1;
-  },
-
-  // ── Stars ─────────────────────────────────────────────────────────
-  _drawStars(ctx, w, h) {
-    [[0.05,0.07],[0.18,0.03],[0.92,0.06],[0.83,0.11],[0.08,0.82],
-     [0.94,0.88],[0.76,0.04],[0.02,0.43],[0.97,0.56],[0.50,0.02],
-     [0.28,0.93],[0.70,0.96],[0.37,0.04],[0.64,0.09],[0.16,0.17],
-     [0.87,0.30],[0.03,0.64],[0.95,0.73],[0.44,0.97],[0.58,0.99],
-     [0.12,0.50],[0.88,0.50],[0.33,0.33],[0.66,0.70],[0.50,0.88],
-    ].forEach(([fx,fy]) => {
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.beginPath(); ctx.arc(fx*w, fy*h, 1.3, 0, TWO_PI); ctx.fill();
-    });
-  },
-
-  // ── Zoom toggle (smooth animation) ───────────────────────────────
-  _toggleZoom() {
-    const target = this._zoom > 1.1 ? 1.0 : 1.5;
-    const start  = this._zoom, t0 = Date.now(), dur = 320;
-    const tick   = () => {
-      const p = Math.min(1, (Date.now()-t0)/dur);
-      const e = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
-      this._zoom = start + (target-start)*e;
-      this._draw();
-      if (p < 1) this._canvas.requestAnimationFrame(tick);
-    };
-    this._canvas.requestAnimationFrame(tick);
-    const lang = this.data.lang;
-    const hint = target > 1.1
-      ? (lang === 'en' ? 'Double tap to zoom out' : '双击缩小')
-      : (lang === 'en' ? 'Double tap to zoom in 🔍' : '双击放大 🔍');
-    this.setData({ hintText: hint, hintVisible: true });
-    setTimeout(() => this.setData({ hintVisible: false }), 2500);
-  },
-
-  // ── Touch handlers ────────────────────────────────────────────────
   onTouchStart(e) {
     const t = e.touches[0];
-    this._dragStartX    = t.x;
-    this._dragStartY    = t.y;
-    this._dragStartRot  = this._rotY;
-    this._dragStartRotX = this._rotX;
-    this._isDragging    = false;
+    this._touchStartX = t.x; this._touchStartY = t.y; this._touchMoved = false;
   },
-
   onTouchMove(e) {
-    const t  = e.touches[0];
-    const dx = t.x - this._dragStartX;
-    const dy = t.y - this._dragStartY;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) this._isDragging = true;
-    this._rotY = this._dragStartRot  + dx / (this._R * this._zoom * 1.1);
-    this._rotX = this._dragStartRotX + dy / (this._R * this._zoom * 1.1);
-    this._rotX = Math.max(-1.4, Math.min(1.4, this._rotX));
-    this._draw();
+    const t = e.touches[0];
+    if (Math.abs(t.x - this._touchStartX) > 8 || Math.abs(t.y - this._touchStartY) > 8)
+      this._touchMoved = true;
   },
-
   onTouchEnd(e) {
-    if (this._isDragging) return;
-    const { x: tx, y: ty } = e.changedTouches[0];
-    const now = Date.now();
-    if (now - this._lastTapTime < 300) {
-      clearTimeout(this._tapTimer);
-      this._lastTapTime = 0;
-      this._toggleZoom();
-    } else {
-      this._lastTapTime = now;
-      this._tapTimer = setTimeout(() => {
-        const R = this._R * this._zoom;
-        let best = -1, bestDist = R * 0.30;
-        for (let i = 0; i < ROAD.length; i++) {
-          const pt = this._project(ROAD[i].lat, ROAD[i].lon);
-          if (!pt.visible) continue;
-          const d = Math.hypot(tx - pt.sx, ty - pt.sy);
-          if (d < bestDist) { bestDist = d; best = i; }
-        }
-        if (best >= 0) {
-          wx.navigateTo({ url: `/pages/intro/intro?id=${BOOKS[ROAD[best].bookIdx].id}` });
-        }
-      }, 310);
-    }
+    if (this._touchMoved) return;
+    const { x, y } = e.changedTouches[0];
+    this._engine && this._engine.handleTap(x, y);
   },
 
   setLang(e) {
@@ -541,5 +147,177 @@ Page({
     wx.setStorageSync('lang', lang);
     getApp().globalData.lang = lang;
     this.setData({ lang });
+    if (this._engine) {
+      const config = buildConfig(lang);
+      config.locations.forEach(loc => { loc.onTap = (l) => this._onLocationTap(l); });
+      this._config = config;
+      this._applyProgress();
+    }
+  },
+
+  // ── Unlock logic ──────────────────────────────────────────────────────────
+
+  _getUnlockedCount() {
+    if (!auth.isLoggedIn()) return 1;
+    // Walk in order — stop at first unplayed checkpoint so unlocking is strictly sequential.
+    // count starts at 1 (checkpoint 0 is always available when logged in).
+    let count = 1;
+    for (let i = 0; i < CHECKPOINT_ORDER.length; i++) {
+      const p = progress.getBook(CHECKPOINT_ORDER[i].bookId);
+      if (p && p.attempts > 0) {
+        // This checkpoint is done — the next one (i+1) becomes available
+        count = i + 2;
+      } else {
+        // Gap found — stop here, everything beyond stays locked
+        break;
+      }
+    }
+    // Cap at total checkpoints so it never exceeds the array length
+    return Math.min(count, CHECKPOINT_ORDER.length);
+  },
+
+  _setLocationStates(unlockedCount) {
+    if (!this._config) return;
+    this._config.locations.forEach(loc => {
+      const order = CHECKPOINT_ORDER.findIndex(c => c.locId === loc.id);
+      if (order !== -1) loc.state = order < unlockedCount ? 'unlocked' : 'locked';
+    });
+  },
+
+  _applyProgress() {
+    if (!this._engine || !this._config) return;
+
+    const unlockedCount = this._getUnlockedCount();
+
+    // Detect new unlocks — only animate when count rises within the same session
+    if (this._unlockedCount !== null && unlockedCount > this._unlockedCount) {
+      for (let i = this._unlockedCount; i < unlockedCount; i++) {
+        const delay = (i - this._unlockedCount) * 2800;
+        setTimeout(() => this._triggerUnlockAnimation(i - 1), delay);
+      }
+    }
+    this._unlockedCount = unlockedCount;
+
+    this._setLocationStates(unlockedCount);
+    this._config.locations.forEach(loc => {
+      const bookId = CONTENT_BOOK[loc.contentRef];
+      const p = bookId ? progress.getBook(bookId) : null;
+      loc.stars = bookId ? progress.getStars(p) : undefined;
+
+      if (bookId && loc.state !== 'locked') {
+        const book = BOOKS.find(b => b.id === bookId);
+        if (!p) {
+          loc.contentBadge = 'new';
+        } else if (book && book.questions.length > (p.bestTotal || 0)) {
+          loc.contentBadge = '+' + (book.questions.length - (p.bestTotal || 0));
+        } else {
+          loc.contentBadge = null;
+        }
+      } else {
+        loc.contentBadge = null;
+      }
+    });
+
+    this._engine.updateLocations(this._config.locations);
+  },
+
+  // ── Unlock animation ──────────────────────────────────────────────────────
+
+  _triggerUnlockAnimation(segIdx) {
+    const seg = PATH_SEGMENTS[segIdx];
+    if (!seg || !this._engine) return;
+
+    const startTime = Date.now();
+    const DURATION  = 2400;
+    const TRAIL_LEN = 10;
+    const key       = 'unlock_seg_' + segIdx;
+
+    this._engine.triggerOverlay(key, (ctx, w, h) => {
+      const elapsed = Date.now() - startTime;
+      const t = Math.min(elapsed / DURATION, 1);
+
+      if (t >= 1) {
+        this._engine.clearOverlay(key);
+        this._triggerArrivalBurst(seg.p1);
+        return;
+      }
+
+      // Fading trail
+      for (let i = TRAIL_LEN; i >= 0; i--) {
+        const tp = Math.max(0, t - i * 0.012);
+        const pt = bezierPt(seg.p0, seg.cp, seg.p1, tp);
+        ctx.save();
+        ctx.globalAlpha = (1 - i / TRAIL_LEN) * 0.55;
+        ctx.fillStyle   = '#FFD700';
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur  = 8;
+        ctx.beginPath();
+        ctx.arc(pt.x * w, pt.y * h, Math.max(w * 0.009 * (1 - i * 0.06), w * 0.003), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Glowing head particle
+      const head = bezierPt(seg.p0, seg.cp, seg.p1, t);
+      const hx = head.x * w, hy = head.y * h;
+      ctx.save();
+      ctx.shadowColor = '#FFE566';
+      ctx.shadowBlur  = 28;
+      ctx.fillStyle   = '#FFE566';
+      ctx.beginPath();
+      ctx.arc(hx, hy, w * 0.020, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth   = 1.8;
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+        ctx.beginPath();
+        ctx.moveTo(hx + Math.cos(a) * w * 0.020, hy + Math.sin(a) * w * 0.020);
+        ctx.lineTo(hx + Math.cos(a) * w * 0.034, hy + Math.sin(a) * w * 0.034);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }, 20);
+  },
+
+  _triggerArrivalBurst(pos) {
+    const startTime = Date.now();
+    const DURATION  = 900;
+    const key       = 'arrival_' + pos.x + '_' + pos.y;
+    const COLORS    = ['#FFD700', '#FF6B35', '#FFE566', '#FFFFFF'];
+
+    this._engine.triggerOverlay(key, (ctx, w, h) => {
+      const t = Math.min((Date.now() - startTime) / DURATION, 1);
+      if (t >= 1) { this._engine.clearOverlay(key); return; }
+
+      const x = pos.x * w, y = pos.y * h;
+      const alpha = 1 - t;
+
+      // Expanding ring
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.75;
+      ctx.strokeStyle = '#FFD700';
+      ctx.lineWidth   = 3;
+      ctx.shadowColor = '#FFD700';
+      ctx.shadowBlur  = 20;
+      ctx.beginPath();
+      ctx.arc(x, y, w * (0.06 + t * 0.14), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Burst particles
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const dist  = t * w * 0.13;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle   = COLORS[i % COLORS.length];
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur  = 10;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(angle) * dist, y + Math.sin(angle) * dist, w * 0.009, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }, 21);
   },
 });

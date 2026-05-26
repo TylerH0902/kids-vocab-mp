@@ -1,0 +1,160 @@
+<view class="page">
+
+  <!-- ── Login form ────────────────────────────────────────────────── -->
+  <block wx:if="{{!showPermissions}}">
+
+    <!-- Language toggle -->
+    <view class="lang-row">
+      <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+      <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+    </view>
+
+    <!-- Hero -->
+    <view class="hero">
+      <image class="hero-logo" src="/assets/logo.png" mode="aspectFit" />
+      <text class="hero-title">{{lang==='en' ? 'Story Quest' : '小小故事星'}}</text>
+      <text class="hero-sub">{{lang==='en' ? 'Your reading adventure' : 'Story Quest'}}</text>
+    </view>
+
+    <!-- WeChat one-tap login -->
+    <button
+      class="btn-wechat {{wxLoading?'btn-loading':''}}"
+      bindtap="onWxLogin"
+      loading="{{wxLoading}}"
+      disabled="{{wxLoading}}"
+    >
+      <text class="wechat-icon">✦</text>
+      <text>{{wxLoading ? (lang==='en'?'Logging in…':'登录中…') : (lang==='en'?'Continue with WeChat':'微信登录')}}</text>
+    </button>
+
+    <!-- Divider -->
+    <view class="divider">
+      <view class="divider-line" />
+      <text class="divider-or">{{lang==='en' ? 'or' : '或'}}</text>
+      <view class="divider-line" />
+    </view>
+
+    <!-- Phone + code form -->
+    <view class="card">
+
+      <!-- Phone number row -->
+      <view class="phone-row">
+        <text class="prefix">+86</text>
+        <view class="vsep" />
+        <input
+          class="input-phone"
+          type="number"
+          maxlength="11"
+          placeholder="{{lang==='en' ? 'Phone number' : '手机号'}}"
+          placeholder-class="input-ph"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          disabled="{{codeSent}}"
+        />
+        <button
+          class="btn-send {{countdown>0?'btn-send-count':''}}"
+          bindtap="onSendCode"
+          loading="{{sending}}"
+          disabled="{{phone.length<11||countdown>0||sending}}"
+        >{{countdown>0 ? countdown+'s' : (lang==='en'?'Send Code':'发送验证码')}}</button>
+      </view>
+
+      <!-- Verification code row (appears after sending) -->
+      <view wx:if="{{codeSent}}" class="code-row">
+        <text class="code-label">{{lang==='en' ? 'Code' : '验证码'}}</text>
+        <input
+          class="input-code"
+          type="number"
+          maxlength="6"
+          placeholder="{{lang==='en' ? '6-digit code' : '6 位验证码'}}"
+          placeholder-class="input-ph"
+          value="{{code}}"
+          bindinput="onCodeInput"
+          focus="{{codeSent}}"
+        />
+      </view>
+
+      <!-- Confirm login button -->
+      <button
+        wx:if="{{codeSent}}"
+        class="btn-phone-login {{code.length>=4?'btn-ready':''}}"
+        bindtap="onPhoneLogin"
+        loading="{{verifying}}"
+        disabled="{{code.length<4||verifying}}"
+      >{{lang==='en' ? 'Login' : '登录'}}</button>
+
+    </view>
+
+    <!-- Error message -->
+    <text wx:if="{{error}}" class="error-msg">{{error}}</text>
+
+  </block>
+
+  <!-- ── Permissions screen ─────────────────────────────────────────── -->
+  <block wx:else>
+
+    <view class="perm-page">
+
+      <text class="perm-title">{{lang==='en'?'One more thing…':'快速设置'}}</text>
+      <text class="perm-sub">{{lang==='en'?'Personalize your profile':'个性化你的体验'}}</text>
+
+      <!-- Avatar picker -->
+      <button class="perm-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image wx:if="{{permAvatarUrl}}" class="perm-avatar-img" src="{{permAvatarUrl}}" mode="aspectFill" />
+        <view wx:else class="perm-avatar-circle">
+          <text class="perm-avatar-letter">{{permAvatarLetter}}</text>
+        </view>
+        <view class="perm-avatar-badge">📷</view>
+      </button>
+
+      <!-- Nickname input -->
+      <input
+        class="perm-nickname-input"
+        type="nickname"
+        placeholder="{{lang==='en'?'Your name':'你的昵称'}}"
+        placeholder-class="perm-nickname-ph"
+        value="{{permNickname}}"
+        bindinput="onNicknameInput"
+      />
+
+      <!-- Permission rows -->
+      <view class="perm-rows">
+
+        <view class="perm-row">
+          <view class="perm-row-left">
+            <text class="perm-icon">📍</text>
+            <view class="perm-row-text">
+              <text class="perm-row-title">{{lang==='en'?'Location':'位置服务'}}</text>
+              <text class="perm-row-sub">{{lang==='en'?'For local reading events':'附近读书活动'}}</text>
+            </view>
+          </view>
+          <view class="perm-allow-btn {{locGranted?'granted':''}}" bindtap="onAllowLocation">
+            {{locGranted?(lang==='en'?'✓ On':'✓ 已开'):(lang==='en'?'Allow':'允许')}}
+          </view>
+        </view>
+
+        <view class="perm-row">
+          <view class="perm-row-left">
+            <text class="perm-icon">🔔</text>
+            <view class="perm-row-text">
+              <text class="perm-row-title">{{lang==='en'?'Notifications':'消息通知'}}</text>
+              <text class="perm-row-sub">{{lang==='en'?'Reminders & achievements':'提醒和成就通知'}}</text>
+            </view>
+          </view>
+          <view class="perm-allow-btn {{notifGranted?'granted':''}}" bindtap="onAllowNotification">
+            {{notifGranted?(lang==='en'?'✓ On':'✓ 已开'):(lang==='en'?'Allow':'允许')}}
+          </view>
+        </view>
+
+      </view>
+
+      <button class="perm-continue-btn" bindtap="onContinue">
+        {{lang==='en'?"Let's go! 🚀":'出发！🚀'}}
+      </button>
+      <text class="perm-skip" bindtap="onContinue">{{lang==='en'?'Skip for now':'暂时跳过'}}</text>
+
+    </view>
+
+  </block>
+
+</view>

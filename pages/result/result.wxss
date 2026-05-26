@@ -6,7 +6,31 @@
   align-items: center;
   gap: 24rpx;
   background: linear-gradient(160deg, #FFF8F0 0%, #F0F8FF 100%);
+  position: relative;
+  overflow: hidden;
 }
+
+/* ── Confetti ── */
+.confetti-wrap {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes confettiFall {
+  0%   { transform: translateY(-20rpx) rotate(0deg);   opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: translateY(110vh)  rotate(600deg); opacity: 0; }
+}
+
+.confetto {
+  position: absolute;
+  top: -20rpx;
+  animation: confettiFall ease-in both;
+}
+.confetto.circle { border-radius: 50%; }
+.confetto.square { border-radius: 4rpx; }
 
 .lang-row { display: flex; gap: 12rpx; align-self: flex-end; margin-bottom: 8rpx; }
 .lang-btn {

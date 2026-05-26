@@ -2,7 +2,6 @@
 
   <!-- Coloured header band -->
   <view class="header-band" style="background:{{headerColor}};">
-    <!-- Lang toggle floats top-right -->
     <view class="lang-row">
       <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
       <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
@@ -15,20 +14,61 @@
     <text class="book-title">{{bookTitle}}</text>
     <text class="book-sub">{{bookSub}}</text>
 
-    <view class="stats-row">
-      <view class="stat-badge">
-        <text class="stat-num">{{total}}</text>
-        <text class="stat-label">{{questionsLabel}}</text>
-      </view>
-      <view class="stat-badge">
-        <text class="stat-num">🏆</text>
-        <text class="stat-label">{{quizLabel}}</text>
+    <!-- New-content banner (single book, after first play) -->
+    <view class="new-banner" wx:if="{{newCount > 0}}">
+      <text class="new-banner-text">🆕 {{newBannerText}}</text>
+    </view>
+
+    <!-- Series: chapter picker -->
+    <view class="chapter-list" wx:if="{{isSeries}}">
+      <view wx:for="{{chapterList}}" wx:key="id"
+            class="chapter-row" bindtap="startChapter" data-id="{{item.id}}"
+            style="border-left-color:{{headerColor}};">
+        <view class="chapter-info">
+          <text class="chapter-sub">{{item.sub}}</text>
+          <view class="ch-meta">
+            <text class="chapter-count">{{item.total}} Qs</text>
+            <view class="ch-stars" wx:if="{{item.played}}">
+              <text class="ch-star {{item.stars > 0 ? 'filled' : ''}}">★</text>
+              <text class="ch-star {{item.stars > 1 ? 'filled' : ''}}">★</text>
+              <text class="ch-star {{item.stars > 2 ? 'filled' : ''}}">★</text>
+              <text class="ch-best">{{item.bestText}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="ch-new-badge" wx:if="{{item.newCount > 0}}">
+          <text class="ch-new-text">+{{item.newCount}}</text>
+        </view>
+        <text class="chapter-arrow">›</text>
       </view>
     </view>
 
-    <view class="start-btn" style="background:{{headerColor}};" bindtap="startQuiz">
-      <text class="start-text">{{startLabel}}</text>
-    </view>
+    <!-- Single book: stats + progress + start button -->
+    <block wx:else>
+
+      <!-- Previous best (only shown after first play) -->
+      <view class="stars-row" wx:if="{{played}}">
+        <text class="star {{stars > 0 ? 'filled' : ''}}">★</text>
+        <text class="star {{stars > 1 ? 'filled' : ''}}">★</text>
+        <text class="star {{stars > 2 ? 'filled' : ''}}">★</text>
+        <text class="best-score">{{bestText}}</text>
+      </view>
+
+      <view class="stats-row">
+        <view class="stat-badge">
+          <text class="stat-num">{{total}}</text>
+          <text class="stat-label">{{questionsLabel}}</text>
+        </view>
+        <view class="stat-badge">
+          <text class="stat-num">🏆</text>
+          <text class="stat-label">{{quizLabel}}</text>
+        </view>
+      </view>
+
+      <view class="start-btn" style="background:{{headerColor}};" bindtap="startQuiz">
+        <text class="start-text">{{startLabel}}</text>
+      </view>
+    </block>
 
     <view class="back-link" bindtap="goBack">
       <text>{{backLabel}}</text>
