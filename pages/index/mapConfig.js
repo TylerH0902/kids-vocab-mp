@@ -423,6 +423,45 @@ function drawBarn(ctx, x, y, s) {
   ctx.beginPath(); ctx.arc(x + s * .06, y + s * .33, s * .018, 0, TWO_PI); ctx.fill();
 }
 
+function drawGruffaloWood(ctx, x, y, s) {
+  blob(ctx, x, y + s * .55, s * 1.10, s * .30, 'rgba(0,0,0,.28)');
+  // Root flares
+  ctx.fillStyle = '#1A0E04';
+  [[-1, .34, -.40, .55], [1, .32, .40, .55]].forEach(([dir, yt, ex]) => {
+    ctx.beginPath();
+    ctx.moveTo(x + dir * s * .20, y + yt * s);
+    ctx.lineTo(x + dir * s * ex, y + s * .55);
+    ctx.lineTo(x + dir * s * .10, y + s * .55);
+    ctx.closePath(); ctx.fill();
+  });
+  // Trunk
+  ctx.fillStyle = '#2A1604';
+  ctx.fillRect(x - s * .20, y - s * .46, s * .40, s * 1.02);
+  ctx.fillStyle = '#180E02';
+  ctx.fillRect(x + s * .10, y - s * .46, s * .10, s * 1.02);
+  // Hollow
+  ctx.fillStyle = '#050202';
+  ctx.fillRect(x - s * .12, y - s * .08, s * .24, s * .40);
+  ctx.beginPath(); ctx.arc(x, y - s * .08, s * .12, Math.PI, 0); ctx.fill();
+  // Glowing orange eyes
+  ctx.save();
+  ctx.shadowColor = '#FF5500'; ctx.shadowBlur = s * .16;
+  ctx.fillStyle = '#FF8800';
+  ctx.beginPath(); ctx.arc(x - s * .06, y + s * .07, s * .036, 0, TWO_PI); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + s * .06, y + s * .07, s * .036, 0, TWO_PI); ctx.fill();
+  ctx.restore();
+  // Dark canopy blobs
+  const canopy = [
+    [0,    -.50, .64, '#183208'], [-.36, -.64, .52, '#1E3E0A'],
+    [.38,  -.62, .50, '#1A3808'], [-.14, -.90, .46, '#224408'],
+    [.16,  -.88, .44, '#1C3E06'], [0,  -1.08,  .36, '#284C10'],
+  ];
+  for (const [dx, dy, r, col] of canopy) {
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s, r * s, 0, TWO_PI); ctx.fill();
+  }
+}
+
 function drawCloud(ctx, cx, cy, r) {
   ctx.save();
   ctx.shadowColor = 'rgba(255,255,255,0.4)';
@@ -567,12 +606,12 @@ function buildConfig(lang) {
           ],
           // Uses quadratic curves via PATH_CPS — see drawFn override below
           drawFn(ctx, w, h) {
-            const stops = [[.21, .72], [.20, .34], [.78, .32], [.58, .56], [.80, .74]];
-            const cps   = [[.08, .53], [.50, .08], [.72, .28], [.62, .72]];
+            const stops = [[.48, .86], [.21, .72], [.20, .34], [.78, .32], [.58, .56], [.80, .74]];
+            const cps   = [[.30, .82], [.08, .53], [.50, .08], [.72, .28], [.62, .72]];
             ctx.strokeStyle = 'rgba(255,255,255,.88)';
             ctx.lineWidth = w * .011; ctx.lineCap = 'round';
             ctx.setLineDash([w * .018, w * .028]);
-            for (let seg = 0; seg < 4; seg++) {
+            for (let seg = 0; seg < 5; seg++) {
               const [x0, y0] = stops[seg], [x1, y1] = stops[seg + 1], [cx, cy] = cps[seg];
               ctx.beginPath(); ctx.moveTo(x0 * w, y0 * h); ctx.quadraticCurveTo(cx * w, cy * h, x1 * w, y1 * h); ctx.stroke();
             }
@@ -584,6 +623,23 @@ function buildConfig(lang) {
 
     locations: [
       {
+        id: 'gruffalo_wood',
+        label: label("Gruffalo's Wood", '咕噜牛的树林'),
+        position: { x: .48, y: .86 },
+        scale: 1.0,
+        zIndex: 7,
+        hitRadius: .13,
+        state: 'locked',
+        contentRef: 'book_7',
+        color: '#3A6020',
+        badgeNum: 1,
+        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawGruffaloWood(ctx, x, y, s); },
+        animations: { idle: null, onTap: null },
+        banner: {
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label("Gruffalo's Wood", '咕噜牛的树林'), '#3A6020', w); },
+        },
+      },
+      {
         id: 'caterpillar_glen',
         label: label('Caterpillar Glen', '毛毛虫谷'),
         position: { x: .21, y: .72 },
@@ -593,7 +649,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_3',
         color: '#2E7D50',
-        badgeNum: 1,
+        badgeNum: 2,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawMushroomHouse(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
@@ -610,7 +666,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_4',
         color: '#2E5E80',
-        badgeNum: 2,
+        badgeNum: 3,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawTreehouse(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
@@ -627,7 +683,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_0',
         color: '#6830A0',
-        badgeNum: 3,
+        badgeNum: 4,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawCastle(ctx, x, y, s); },
         animations: { idle: null, onTap: 'dragon_fire' },
         banner: {
@@ -644,7 +700,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_6',
         color: '#8B4513',
-        badgeNum: 4,
+        badgeNum: 5,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawBarn(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
@@ -661,7 +717,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_5',
         color: '#8C6020',
-        badgeNum: 5,
+        badgeNum: 6,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawSchool(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {

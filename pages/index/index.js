@@ -6,6 +6,7 @@ const { buildConfig } = require('./mapConfig');
 
 // Ordered unlock sequence — completing index N unlocks index N+1
 const CHECKPOINT_ORDER = [
+  { locId: 'gruffalo_wood',    bookId: BOOKS[7].id },
   { locId: 'caterpillar_glen', bookId: BOOKS[3].id },
   { locId: 'wild_wood',        bookId: BOOKS[4].id },
   { locId: 'wonder_castle',    bookId: BOOKS[0].id },
@@ -15,6 +16,7 @@ const CHECKPOINT_ORDER = [
 
 // Bezier path segments connecting each checkpoint pair (matches mapConfig drawFn)
 const PATH_SEGMENTS = [
+  { p0:{x:.48,y:.86}, cp:{x:.30,y:.82}, p1:{x:.21,y:.72} },
   { p0:{x:.21,y:.72}, cp:{x:.08,y:.53}, p1:{x:.20,y:.34} },
   { p0:{x:.20,y:.34}, cp:{x:.50,y:.08}, p1:{x:.78,y:.32} },
   { p0:{x:.78,y:.32}, cp:{x:.72,y:.28}, p1:{x:.58,y:.56} },
@@ -28,6 +30,7 @@ const CONTENT_BOOK = {
   book_4: BOOKS[4].id,
   book_5: BOOKS[5].id,
   book_6: BOOKS[6].id,
+  book_7: BOOKS[7].id,
 };
 
 function bezierPt(p0, cp, p1, t) {
@@ -120,7 +123,7 @@ Page({
     const book = {
       book_0: BOOKS[0], book_3: BOOKS[3],
       book_4: BOOKS[4], book_5: BOOKS[5],
-      book_6: BOOKS[6],
+      book_6: BOOKS[6], book_7: BOOKS[7],
     }[loc.contentRef];
     if (book) wx.navigateTo({ url: `/pages/intro/intro?id=${book.id}` });
   },
