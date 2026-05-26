@@ -26,6 +26,7 @@ Page({
     feedbackVisible: false,
     feedbackText:    '',
     feedbackState:   '',
+    fireworks:       [],
     progress:        0,
     speaking:        false,
     replayLabel:     'Replay',
@@ -170,6 +171,8 @@ Page({
         : (c.correct && !isRight ? 'correct' : c.state),
     }));
 
+    const fireworks = isRight ? this._makeFireworks() : [];
+
     this.setData({
       answered:        true,
       choices:         updated,
@@ -177,6 +180,27 @@ Page({
       feedbackText:    t(lang, isRight ? 'correct' : 'wrong'),
       feedbackState:   isRight ? 'correct' : 'wrong',
       correct:         isRight ? this.data.correct + 1 : this.data.correct,
+      fireworks,
+    });
+
+    if (isRight) setTimeout(() => this.setData({ fireworks: [] }), 1500);
+  },
+
+  _makeFireworks() {
+    const COLORS = ['#FF6B35','#FFD93D','#00C896','#9B59B6','#FF4757','#2ED573','#1E90FF','#FF6B81','#FFE566','#FFFFFF'];
+    return Array.from({ length: 28 }, (_, i) => {
+      const angle = (i / 28) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const dist  = 18 + Math.random() * 24;
+      return {
+        id:     i,
+        color:  COLORS[i % COLORS.length],
+        size:   7 + Math.floor(Math.random() * 9),
+        x:      +(50 + Math.cos(angle) * dist).toFixed(1),
+        y:      +(42 + Math.sin(angle) * dist).toFixed(1),
+        delay:  Math.round(Math.random() * 200),
+        dur:    650 + Math.floor(Math.random() * 400),
+        circle: i % 3 !== 0,
+      };
     });
   },
 

@@ -119,6 +119,26 @@
 .choice-row.correct { animation: correctBounce .45s ease; }
 .choice-row.wrong   { animation: wrongShake .4s ease; }
 
+/* Fireworks */
+.fw-wrap {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 200; overflow: hidden;
+}
+.fw-dot {
+  position: absolute;
+  animation-name: fwPop;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+.fw-circle { border-radius: 50%; }
+.fw-square  { border-radius: 3px; }
+@keyframes fwPop {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0); }
+  25%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.4); }
+  70%  { opacity: 0.9; transform: translate(-50%, -50%) scale(1.0); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(0.4); }
+}
+
 /* Feedback bar */
 .feedback {
   position: fixed; bottom: 0; left: 0; right: 0;

@@ -40,6 +40,14 @@
     </view>
   </view>
 
+  <!-- Fireworks overlay -->
+  <view class="fw-wrap" wx:if="{{fireworks.length}}">
+    <view wx:for="{{fireworks}}" wx:key="id"
+      class="fw-dot {{item.circle ? 'fw-circle' : 'fw-square'}}"
+      style="left:{{item.x}}%;top:{{item.y}}%;width:{{item.size}}px;height:{{item.size}}px;background:{{item.color}};animation-duration:{{item.dur}}ms;animation-delay:{{item.delay}}ms;">
+    </view>
+  </view>
+
   <!-- Feedback bar -->
   <view class="feedback {{feedbackState}}" wx:if="{{feedbackVisible}}">
     <text class="fb-text">{{feedbackText}}</text>
