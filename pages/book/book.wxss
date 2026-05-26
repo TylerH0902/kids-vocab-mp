@@ -119,37 +119,10 @@
 .choice-row.correct { animation: correctBounce .45s ease; }
 .choice-row.wrong   { animation: wrongShake .4s ease; }
 
-/* Fireworks */
-.fw-wrap {
+/* Fireworks canvas */
+.fw-canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 200; overflow: hidden;
-}
-.fw-dot {
-  position: absolute;
-  animation-name: fwPop;
-  animation-timing-function: ease-out;
-  animation-fill-mode: both;
-}
-.fw-circle { border-radius: 50%; }
-.fw-square  { border-radius: 3px; }
-.fw-flash {
-  position: absolute; left: 50%; top: 42%;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.95);
-  transform: translate(-50%, -50%);
-  animation: fwFlash 0.55s ease-out both;
-}
-@keyframes fwFlash {
-  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0); }
-  40%  { opacity: 0.8; transform: translate(-50%, -50%) scale(14); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(20); }
-}
-@keyframes fwPop {
-  0%   { opacity: 0;    transform: translate(-50%, -50%) scale(0); }
-  18%  { opacity: 1;    transform: translate(-50%, -50%) scale(2.4); }
-  55%  { opacity: 0.9;  transform: translate(-50%, -50%) scale(1.3); }
-  100% { opacity: 0;    transform: translate(-50%, -50%) scale(0.1); }
+  pointer-events: none; z-index: 200;
 }
 
 /* Feedback bar */

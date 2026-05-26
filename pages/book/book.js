@@ -10,6 +10,8 @@ function shuffle(arr) {
   return a;
 }
 
+const FW_COLORS = ['#FF6B35','#FFD93D','#00C896','#9B59B6','#FF4757','#2ED573','#1E90FF','#FF6B81','#FFE566','#FFFFFF'];
+
 Page({
   data: {
     lang:            'en',
@@ -26,7 +28,7 @@ Page({
     feedbackVisible: false,
     feedbackText:    '',
     feedbackState:   '',
-    fireworks:       [],
+    fwVisible:       false,
     progress:        0,
     speaking:        false,
     replayLabel:     'Replay',
@@ -35,6 +37,8 @@ Page({
   },
 
   _audioCtx: null,
+  _fwCanvas:  null,
+  _fwRaf:     null,
 
   onLoad(options) {
     const lang = wx.getStorageSync('lang') || 'en';
@@ -105,7 +109,6 @@ Page({
     if (!q) return;
 
     const question = lang === 'en' ? q.q_en : q.q_zh;
-    // preserve shuffled order and answer states, only swap display label
     const choices = this.data.choices.map(c => {
       const opt = q.opts.find(o => o.id === c.id);
       return { ...c, label: lang === 'en' ? opt.en : opt.zh };
@@ -171,8 +174,6 @@ Page({
         : (c.correct && !isRight ? 'correct' : c.state),
     }));
 
-    const fireworks = isRight ? this._makeFireworks() : [];
-
     this.setData({
       answered:        true,
       choices:         updated,
@@ -180,53 +181,155 @@ Page({
       feedbackText:    t(lang, isRight ? 'correct' : 'wrong'),
       feedbackState:   isRight ? 'correct' : 'wrong',
       correct:         isRight ? this.data.correct + 1 : this.data.correct,
-      fireworks,
+      fwVisible:       isRight,
     });
 
-    if (isRight) setTimeout(() => this.setData({ fireworks: [] }), 2500);
+    if (isRight) setTimeout(() => this._startFireworks(), 60);
   },
 
-  _makeFireworks() {
-    const COLORS = ['#FF6B35','#FFD93D','#00C896','#9B59B6','#FF4757','#2ED573','#1E90FF','#FF6B81','#FFE566','#FFFFFF'];
-    const particles = [];
+  // ── Fireworks (Canvas 2D) ─────────────────────────────────────────
+  _startFireworks() {
+    const sys = wx.getSystemInfoSync();
+    const dpr = sys.pixelRatio;
 
-    // Wave 1 — dense burst from center
-    for (let i = 0; i < 40; i++) {
-      const angle = (i / 40) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const dist  = 22 + Math.random() * 34;
-      particles.push({
-        id:     i,
-        color:  COLORS[i % COLORS.length],
-        size:   11 + Math.floor(Math.random() * 13),
-        x:      +(50 + Math.cos(angle) * dist).toFixed(1),
-        y:      +(42 + Math.sin(angle) * dist).toFixed(1),
-        delay:  Math.round(Math.random() * 160),
-        dur:    900 + Math.floor(Math.random() * 550),
-        circle: i % 3 !== 0,
+    wx.createSelectorQuery()
+      .select('#fw-canvas')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (!res[0] || !res[0].node) return;
+        const { node: canvas, width, height } = res[0];
+        canvas.width  = Math.round(width  * dpr);
+        canvas.height = Math.round(height * dpr);
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        this._fwCanvas = canvas;
+
+        const rockets   = [];
+        const particles = [];
+        let frame = 0;
+
+        const launch = () => {
+          const color = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+          rockets.push({
+            x:       width * (0.15 + Math.random() * 0.70),
+            y:       height + 4,
+            vx:      (Math.random() - 0.5) * 2.5,
+            vy:      -(height * (0.013 + Math.random() * 0.009)),
+            targetY: height * (0.10 + Math.random() * 0.32),
+            color,
+            trail:   [],
+          });
+        };
+
+        const explode = (x, y, color) => {
+          for (let k = 0; k < 72; k++) {
+            const angle = Math.random() * Math.PI * 2;
+            const spd   = 2 + Math.random() * 6;
+            particles.push({
+              x, y,
+              vx:    Math.cos(angle) * spd,
+              vy:    Math.sin(angle) * spd - 1.8,
+              color: Math.random() < 0.15 ? '#FFFFFF' : color,
+              alpha: 1,
+              size:  1.8 + Math.random() * 3.2,
+              decay: 0.012 + Math.random() * 0.013,
+            });
+          }
+        };
+
+        // Launch 5 rockets staggered across ~2 s
+        const LAUNCHES = 5;
+        for (let n = 0; n < LAUNCHES; n++) {
+          setTimeout(launch, n * 380 + Math.random() * 120);
+        }
+
+        const tick = () => {
+          // Semi-transparent overlay creates motion-blur trail
+          ctx.fillStyle = 'rgba(0,0,0,0.20)';
+          ctx.fillRect(0, 0, width, height);
+
+          // Rockets
+          for (let i = rockets.length - 1; i >= 0; i--) {
+            const r = rockets[i];
+            r.trail.push({ x: r.x, y: r.y });
+            if (r.trail.length > 12) r.trail.shift();
+            r.x  += r.vx;
+            r.y  += r.vy;
+            r.vy += 0.30;
+
+            r.trail.forEach((pt, ti) => {
+              ctx.save();
+              ctx.globalAlpha = (ti / r.trail.length) * 0.6;
+              ctx.fillStyle   = r.color;
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            });
+
+            ctx.save();
+            ctx.fillStyle   = '#fff';
+            ctx.shadowColor = r.color;
+            ctx.shadowBlur  = 16;
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            if (r.y <= r.targetY) {
+              explode(r.x, r.y, r.color);
+              rockets.splice(i, 1);
+            }
+          }
+
+          // Particles
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x     += p.vx;
+            p.y     += p.vy;
+            p.vy    += 0.09;
+            p.vx    *= 0.97;
+            p.alpha -= p.decay;
+            if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle   = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur  = 5;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          frame++;
+          const stillRunning = rockets.length > 0 || particles.length > 0 || frame < 50;
+          if (stillRunning) {
+            this._fwRaf = canvas.requestAnimationFrame(tick);
+          } else {
+            ctx.clearRect(0, 0, width, height);
+            this.setData({ fwVisible: false });
+            this._fwCanvas = null;
+            this._fwRaf    = null;
+          }
+        };
+
+        this._fwRaf = canvas.requestAnimationFrame(tick);
       });
-    }
+  },
 
-    // Wave 2 — wider scatter, delayed
-    for (let i = 0; i < 26; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist  = 32 + Math.random() * 26;
-      particles.push({
-        id:     40 + i,
-        color:  COLORS[(i + 4) % COLORS.length],
-        size:   9 + Math.floor(Math.random() * 11),
-        x:      +(50 + Math.cos(angle) * dist).toFixed(1),
-        y:      +(42 + Math.sin(angle) * dist).toFixed(1),
-        delay:  320 + Math.round(Math.random() * 220),
-        dur:    750 + Math.floor(Math.random() * 500),
-        circle: Math.random() > 0.3,
-      });
+  _stopFireworks() {
+    if (this._fwCanvas && this._fwRaf) {
+      this._fwCanvas.cancelAnimationFrame(this._fwRaf);
     }
-
-    return particles;
+    this._fwCanvas = null;
+    this._fwRaf    = null;
+    this.setData({ fwVisible: false });
   },
 
   nextQuestion() {
     if (!this.data.answered) return;
+    this._stopFireworks();
     this._stopAudio();
     this._loadQuestion(this.data.qIndex + 1);
   },
