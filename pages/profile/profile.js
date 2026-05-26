@@ -4,6 +4,7 @@ const BOOKS    = require('../../utils/books');
 
 // All books that appear on the map, in display order
 const MAP_BOOKS = [
+  { id: BOOKS[7].id,  title_en: BOOKS[7].title_en, title_zh: BOOKS[7].title_zh, emoji: BOOKS[7].emoji, sub_en: BOOKS[7].sub_en,  sub_zh: BOOKS[7].sub_zh  },
   { id: BOOKS[0].id,  title_en: BOOKS[0].title_en, title_zh: BOOKS[0].title_zh, emoji: BOOKS[0].emoji, sub_en: BOOKS[0].sub_en,  sub_zh: BOOKS[0].sub_zh  },
   { id: BOOKS[1].id,  title_en: BOOKS[1].title_en, title_zh: BOOKS[1].title_zh, emoji: BOOKS[1].emoji, sub_en: BOOKS[1].sub_en,  sub_zh: BOOKS[1].sub_zh  },
   { id: BOOKS[2].id,  title_en: BOOKS[2].title_en, title_zh: BOOKS[2].title_zh, emoji: BOOKS[2].emoji, sub_en: BOOKS[2].sub_en,  sub_zh: BOOKS[2].sub_zh  },
