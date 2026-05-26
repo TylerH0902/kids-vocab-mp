@@ -214,39 +214,37 @@ Page({
             x:       width * (0.15 + Math.random() * 0.70),
             y:       height + 4,
             vx:      (Math.random() - 0.5) * 2.5,
-            vy:      -(height * (0.013 + Math.random() * 0.009)),
-            targetY: height * (0.10 + Math.random() * 0.32),
+            vy:      -(height * (0.022 + Math.random() * 0.012)),
+            targetY: height * (0.10 + Math.random() * 0.28),
             color,
             trail:   [],
           });
         };
 
         const explode = (x, y, color) => {
-          for (let k = 0; k < 72; k++) {
+          for (let k = 0; k < 60; k++) {
             const angle = Math.random() * Math.PI * 2;
-            const spd   = 2 + Math.random() * 6;
+            const spd   = 3 + Math.random() * 7;
             particles.push({
               x, y,
               vx:    Math.cos(angle) * spd,
-              vy:    Math.sin(angle) * spd - 1.8,
+              vy:    Math.sin(angle) * spd - 2,
               color: Math.random() < 0.15 ? '#FFFFFF' : color,
               alpha: 1,
-              size:  1.8 + Math.random() * 3.2,
-              decay: 0.012 + Math.random() * 0.013,
+              size:  2 + Math.random() * 3,
+              decay: 0.024 + Math.random() * 0.018,
             });
           }
         };
 
-        // Launch 5 rockets staggered across ~2 s
+        // Launch 5 rockets staggered across ~1 s
         const LAUNCHES = 5;
         for (let n = 0; n < LAUNCHES; n++) {
-          setTimeout(launch, n * 380 + Math.random() * 120);
+          setTimeout(launch, n * 200 + Math.random() * 60);
         }
 
         const tick = () => {
-          // Semi-transparent overlay creates motion-blur trail
-          ctx.fillStyle = 'rgba(0,0,0,0.20)';
-          ctx.fillRect(0, 0, width, height);
+          ctx.clearRect(0, 0, width, height);
 
           // Rockets
           for (let i = rockets.length - 1; i >= 0; i--) {
@@ -287,7 +285,7 @@ Page({
             const p = particles[i];
             p.x     += p.vx;
             p.y     += p.vy;
-            p.vy    += 0.09;
+            p.vy    += 0.16;
             p.vx    *= 0.97;
             p.alpha -= p.decay;
             if (p.alpha <= 0) { particles.splice(i, 1); continue; }
