@@ -214,7 +214,7 @@ Page({
             x:       width * (0.15 + Math.random() * 0.70),
             y:       height + 4,
             vx:      (Math.random() - 0.5) * 2.5,
-            vy:      -(height * (0.022 + Math.random() * 0.012)),
+            vy:      -(height * (0.028 + Math.random() * 0.012)),
             targetY: height * (0.10 + Math.random() * 0.28),
             color,
             trail:   [],
@@ -232,7 +232,7 @@ Page({
               color: Math.random() < 0.15 ? '#FFFFFF' : color,
               alpha: 1,
               size:  2 + Math.random() * 3,
-              decay: 0.024 + Math.random() * 0.018,
+              decay: 0.030 + Math.random() * 0.020,
             });
           }
         };
@@ -240,7 +240,7 @@ Page({
         // Launch 5 rockets staggered across ~1 s
         const LAUNCHES = 5;
         for (let n = 0; n < LAUNCHES; n++) {
-          setTimeout(launch, n * 200 + Math.random() * 60);
+          setTimeout(launch, n * 150 + Math.random() * 40);
         }
 
         const tick = () => {
