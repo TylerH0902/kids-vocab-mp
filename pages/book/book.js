@@ -183,25 +183,46 @@ Page({
       fireworks,
     });
 
-    if (isRight) setTimeout(() => this.setData({ fireworks: [] }), 1500);
+    if (isRight) setTimeout(() => this.setData({ fireworks: [] }), 2500);
   },
 
   _makeFireworks() {
     const COLORS = ['#FF6B35','#FFD93D','#00C896','#9B59B6','#FF4757','#2ED573','#1E90FF','#FF6B81','#FFE566','#FFFFFF'];
-    return Array.from({ length: 28 }, (_, i) => {
-      const angle = (i / 28) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const dist  = 18 + Math.random() * 24;
-      return {
+    const particles = [];
+
+    // Wave 1 — dense burst from center
+    for (let i = 0; i < 40; i++) {
+      const angle = (i / 40) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const dist  = 22 + Math.random() * 34;
+      particles.push({
         id:     i,
         color:  COLORS[i % COLORS.length],
-        size:   7 + Math.floor(Math.random() * 9),
+        size:   11 + Math.floor(Math.random() * 13),
         x:      +(50 + Math.cos(angle) * dist).toFixed(1),
         y:      +(42 + Math.sin(angle) * dist).toFixed(1),
-        delay:  Math.round(Math.random() * 200),
-        dur:    650 + Math.floor(Math.random() * 400),
+        delay:  Math.round(Math.random() * 160),
+        dur:    900 + Math.floor(Math.random() * 550),
         circle: i % 3 !== 0,
-      };
-    });
+      });
+    }
+
+    // Wave 2 — wider scatter, delayed
+    for (let i = 0; i < 26; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = 32 + Math.random() * 26;
+      particles.push({
+        id:     40 + i,
+        color:  COLORS[(i + 4) % COLORS.length],
+        size:   9 + Math.floor(Math.random() * 11),
+        x:      +(50 + Math.cos(angle) * dist).toFixed(1),
+        y:      +(42 + Math.sin(angle) * dist).toFixed(1),
+        delay:  320 + Math.round(Math.random() * 220),
+        dur:    750 + Math.floor(Math.random() * 500),
+        circle: Math.random() > 0.3,
+      });
+    }
+
+    return particles;
   },
 
   nextQuestion() {
