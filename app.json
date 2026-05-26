@@ -22,7 +22,7 @@
   "__usePrivacyVersion": "20230901",
   "permission": {
     "scope.userLocation": {
-      "desc": "用于为小朋友推荐附近的学习活动（可选）/ Used to suggest nearby learning activities for children (optional)"
+      "desc": "用于推荐附近的学习活动"
     }
   },
   "requiredPrivateInfos": [
