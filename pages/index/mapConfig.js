@@ -682,10 +682,10 @@ function buildConfig(lang) {
         contentRef: 'book_7',
         color: '#3A6020',
         badgeNum: 1,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawGruffaloWood(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; drawGruffaloWood(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label("Gruffalo's Wood", '咕噜牛的树林'), '#3A6020', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label("Gruffalo's Wood", '咕噜牛的树林'), '#3A6020', w); },
         },
       },
       {
@@ -699,10 +699,10 @@ function buildConfig(lang) {
         contentRef: 'book_3',
         color: '#2E7D50',
         badgeNum: 2,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawMushroomHouse(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawMushroomHouse(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label('Caterpillar Glen', '毛毛虫谷'), '#2E7D50', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label('Caterpillar Glen', '毛毛虫谷'), '#2E7D50', w); },
         },
       },
       {
@@ -716,10 +716,10 @@ function buildConfig(lang) {
         contentRef: 'book_8',
         color: '#CC3322',
         badgeNum: 3,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawCatHatHouse(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; drawCatHatHouse(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label('Cat Hat House', '猫帽子小屋'), '#CC3322', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label('Cat Hat House', '猫帽子小屋'), '#CC3322', w); },
         },
       },
       {
@@ -733,10 +733,10 @@ function buildConfig(lang) {
         contentRef: 'book_4',
         color: '#2E5E80',
         badgeNum: 4,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawTreehouse(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawTreehouse(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label('Wild Wood', '野兽森林'), '#2E5E80', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label('Wild Wood', '野兽森林'), '#2E5E80', w); },
         },
       },
       {
@@ -750,10 +750,10 @@ function buildConfig(lang) {
         contentRef: 'book_0',
         color: '#6830A0',
         badgeNum: 5,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawCastle(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawCastle(ctx, x, y, s); },
         animations: { idle: null, onTap: 'dragon_fire' },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label('Wonder Castle', '奇境城堡'), '#6830A0', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label('Wonder Castle', '奇境城堡'), '#6830A0', w); },
         },
       },
       {
@@ -767,10 +767,10 @@ function buildConfig(lang) {
         contentRef: 'book_6',
         color: '#8B4513',
         badgeNum: 6,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawBarn(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; drawBarn(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label("Charlotte's Barn", '夏洛的谷仓'), '#8B4513', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label("Charlotte's Barn", '夏洛的谷仓'), '#8B4513', w); },
         },
       },
       {
@@ -784,10 +784,10 @@ function buildConfig(lang) {
         contentRef: 'book_5',
         color: '#8C6020',
         badgeNum: 7,
-        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawSchool(ctx, x, y, s); },
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawSchool(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
-          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label('Story School', '故事学院'), '#8C6020', w); },
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label('Story School', '故事学院'), '#8C6020', w); },
         },
       },
     ],
