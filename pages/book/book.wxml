@@ -37,6 +37,7 @@
     >
       <text class="choice-letter">{{item.letter}}</text>
       <text class="choice-text">{{item.label}}</text>
+      <view class="choice-speaker" catchtap="speakChoice" data-id="{{item.id}}">🔊</view>
     </view>
   </view>
 

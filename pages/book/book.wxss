@@ -138,3 +138,4 @@
 .fb-text { color: #fff; font-size: 34rpx; font-weight: 800; text-shadow: 0 1rpx 4rpx rgba(0,0,0,.2); }
 .fb-next { color: #fff; font-size: 32rpx; font-weight: 800;
            padding: 10rpx 18rpx; background: rgba(255,255,255,.25); border-radius: 30rpx; }
+.choice-speaker { font-size: 28rpx; padding: 4rpx 8rpx; opacity: .6; margin-left: auto; flex-shrink: 0; }

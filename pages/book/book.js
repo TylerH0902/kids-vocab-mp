@@ -87,7 +87,7 @@ Page({
       progress:        Math.round((idx / total) * 100),
     });
 
-    this._speak(question, lang);
+    this._playUrl(this._bookAudioUrl(q.qid, null, lang));
   },
 
   setLang(e) {
@@ -122,31 +122,39 @@ Page({
     this.setData(updates);
   },
 
-  // ── TTS ──────────────────────────────────────────────────────────
+  // ── Audio ─────────────────────────────────────────────────────────
   speakQuestion() {
-    this._speak(this.data.question, this.data.lang);
+    const q = this.data.questions[this.data.qIndex];
+    if (q) this._playUrl(this._bookAudioUrl(q.qid, null, this.data.lang));
   },
 
-  _speak(text, lang) {
+  speakChoice(e) {
+    const id  = e.currentTarget.dataset.id;
+    const q   = this.data.questions[this.data.qIndex];
+    if (!q) return;
+    const opt = q.opts.find(o => o.id === id);
+    if (!opt) return;
+    // opt.id format: "{qid}_{optIndex}" e.g. "gr3_1"
+    const parts   = opt.id.split('_');
+    const optIdx  = parts[parts.length - 1];
+    this._playUrl(this._bookAudioUrl(q.qid, optIdx, this.data.lang));
+  },
+
+  _bookAudioUrl(qid, optIdx, lang) {
+    const base = 'https://tylerh0902.github.io/kids-vocab-audio/book';
+    const file = optIdx !== null ? `${qid}_${optIdx}.mp3` : `${qid}.mp3`;
+    return `${base}/${lang}/${file}`;
+  },
+
+  _playUrl(url) {
     this._stopAudio();
     this.setData({ speaking: true });
-    wx.textToSpeech({
-      lang:    lang === 'zh' ? 'zh_CN' : 'en_US',
-      speed:   0.9,
-      content: text,
-      success: (res) => {
-        const ctx = wx.createInnerAudioContext();
-        this._audioCtx = ctx;
-        ctx.src = res.filename;
-        ctx.play();
-        ctx.onEnded(() => {
-          this.setData({ speaking: false });
-          ctx.destroy(); this._audioCtx = null;
-        });
-        ctx.onError(() => this.setData({ speaking: false }));
-      },
-      fail: () => this.setData({ speaking: false })
-    });
+    const ctx = wx.createInnerAudioContext();
+    this._audioCtx = ctx;
+    ctx.src = url;
+    ctx.play();
+    ctx.onEnded(() => { this.setData({ speaking: false }); ctx.destroy(); this._audioCtx = null; });
+    ctx.onError(() => { this.setData({ speaking: false }); ctx.destroy(); this._audioCtx = null; });
   },
 
   _stopAudio() {
