@@ -3,7 +3,7 @@ const progress     = require('../../utils/progress');
 const BOOKS        = require('../../utils/books');
 
 const CHECKPOINT_IDS = new Set([
-  BOOKS[0].id, BOOKS[3].id, BOOKS[4].id, BOOKS[5].id, BOOKS[6].id, BOOKS[7].id,
+  BOOKS[0].id, BOOKS[3].id, BOOKS[4].id, BOOKS[5].id, BOOKS[6].id, BOOKS[7].id, BOOKS[8].id,
 ]);
 
 Page({

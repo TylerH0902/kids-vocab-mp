@@ -423,6 +423,55 @@ function drawBarn(ctx, x, y, s) {
   ctx.beginPath(); ctx.arc(x + s * .06, y + s * .33, s * .018, 0, TWO_PI); ctx.fill();
 }
 
+function drawCatHatHouse(ctx, x, y, s) {
+  // Shadow
+  blob(ctx, x, y + s * .55, s * 1.10, s * .28, 'rgba(0,0,0,.14)');
+  // House body
+  ctx.fillStyle = '#F5E8D0';
+  ctx.fillRect(x - s * .60, y - s * .36, s * 1.20, s * .86);
+  // Side shading
+  ctx.fillStyle = '#DDD0B0';
+  ctx.fillRect(x + s * .60, y - s * .36, s * .14, s * .86);
+  // Roof
+  ctx.fillStyle = '#CC3322';
+  ctx.beginPath();
+  ctx.moveTo(x - s * .74, y - s * .36);
+  ctx.lineTo(x, y - s * .96);
+  ctx.lineTo(x + s * .74, y - s * .36);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#A82818';
+  ctx.beginPath();
+  ctx.moveTo(x + s * .74, y - s * .36);
+  ctx.lineTo(x + s * .88, y - s * .28);
+  ctx.lineTo(x + s * .16, y - s * .90);
+  ctx.lineTo(x, y - s * .96);
+  ctx.closePath(); ctx.fill();
+  // Door
+  ctx.fillStyle = '#7A4020';
+  ctx.fillRect(x - s * .16, y + s * .10, s * .32, s * .40);
+  ctx.beginPath(); ctx.arc(x, y + s * .10, s * .16, Math.PI, 0); ctx.fill();
+  // Windows
+  ctx.fillStyle = '#A8D8FF';
+  ctx.fillRect(x - s * .48, y - s * .16, s * .24, s * .22);
+  ctx.fillRect(x + s * .24, y - s * .16, s * .24, s * .22);
+  // ── Tall striped hat sitting on roof peak ──
+  const hx = x, hy = y - s * .96;
+  // Brim
+  ctx.fillStyle = '#EEEEEE';
+  ctx.fillRect(hx - s * .34, hy - s * .07, s * .68, s * .13);
+  // Hat body (white base)
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(hx - s * .22, hy - s * .88, s * .44, s * .82);
+  // Red stripes
+  ctx.fillStyle = '#DD2222';
+  ctx.fillRect(hx - s * .22, hy - s * .88, s * .44, s * .17);
+  ctx.fillRect(hx - s * .22, hy - s * .62, s * .44, s * .17);
+  ctx.fillRect(hx - s * .22, hy - s * .36, s * .44, s * .17);
+  // Hat top cap
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(hx - s * .20, hy - s * .95, s * .40, s * .09);
+}
+
 function drawGruffaloWood(ctx, x, y, s) {
   blob(ctx, x, y + s * .55, s * 1.10, s * .30, 'rgba(0,0,0,.28)');
   // Root flares
@@ -606,12 +655,12 @@ function buildConfig(lang) {
           ],
           // Uses quadratic curves via PATH_CPS — see drawFn override below
           drawFn(ctx, w, h) {
-            const stops = [[.48, .86], [.21, .72], [.20, .34], [.78, .32], [.58, .56], [.80, .74]];
-            const cps   = [[.30, .82], [.08, .53], [.50, .08], [.72, .28], [.62, .72]];
+            const stops = [[.48, .86], [.21, .72], [.13, .52], [.20, .34], [.78, .32], [.58, .56], [.80, .74]];
+            const cps   = [[.30, .82], [.16, .63], [.08, .42], [.50, .08], [.72, .28], [.62, .72]];
             ctx.strokeStyle = 'rgba(255,255,255,.88)';
             ctx.lineWidth = w * .011; ctx.lineCap = 'round';
             ctx.setLineDash([w * .018, w * .028]);
-            for (let seg = 0; seg < 5; seg++) {
+            for (let seg = 0; seg < 6; seg++) {
               const [x0, y0] = stops[seg], [x1, y1] = stops[seg + 1], [cx, cy] = cps[seg];
               ctx.beginPath(); ctx.moveTo(x0 * w, y0 * h); ctx.quadraticCurveTo(cx * w, cy * h, x1 * w, y1 * h); ctx.stroke();
             }
@@ -657,6 +706,23 @@ function buildConfig(lang) {
         },
       },
       {
+        id: 'cat_hat_house',
+        label: label('Cat Hat House', '猫帽子小屋'),
+        position: { x: .13, y: .52 },
+        scale: 1.0,
+        zIndex: 7,
+        hitRadius: .13,
+        state: 'locked',
+        contentRef: 'book_8',
+        color: '#CC3322',
+        badgeNum: 3,
+        drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawCatHatHouse(ctx, x, y, s); },
+        animations: { idle: null, onTap: null },
+        banner: {
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .095 * 1.05, label('Cat Hat House', '猫帽子小屋'), '#CC3322', w); },
+        },
+      },
+      {
         id: 'wild_wood',
         label: label('Wild Wood', '野兽森林'),
         position: { x: .20, y: .34 },
@@ -666,7 +732,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_4',
         color: '#2E5E80',
-        badgeNum: 3,
+        badgeNum: 4,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawTreehouse(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
@@ -683,7 +749,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_0',
         color: '#6830A0',
-        badgeNum: 4,
+        badgeNum: 5,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawCastle(ctx, x, y, s); },
         animations: { idle: null, onTap: 'dragon_fire' },
         banner: {
@@ -700,7 +766,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_6',
         color: '#8B4513',
-        badgeNum: 5,
+        badgeNum: 6,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; drawBarn(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
@@ -717,7 +783,7 @@ function buildConfig(lang) {
         state: 'locked',
         contentRef: 'book_5',
         color: '#8C6020',
-        badgeNum: 6,
+        badgeNum: 7,
         drawFn(ctx, x, y, scale, w) { const s = w * .095 * scale; blob(ctx, x, y + s * .55, s * 1.30, s * .40, 'rgba(0,0,0,.14)'); drawSchool(ctx, x, y, s); },
         animations: { idle: null, onTap: null },
         banner: {
