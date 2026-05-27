@@ -532,7 +532,8 @@ function buildConfig(lang) {
   return {
     map: {
       id: 'story_quest',
-      drawFn(ctx, w, h) {
+      background: 'map_bg',
+      _unused_drawFn_start(ctx, w, h) {
         // ── Land base ──
         const g = ctx.createLinearGradient(0, 0, w, h);
         g.addColorStop(0, '#C4D882'); g.addColorStop(0.35, '#AACC68');
@@ -714,48 +715,10 @@ function buildConfig(lang) {
     },
 
     assets: {
-      // Future image assets go here, e.g.:
-      // dragon_fire: { type: 'spritesheet', src: '/assets/sprites/dragon_fire.png', frameWidth: 120, frameHeight: 120, frameCount: 8, fps: 12 }
+      map_bg: { type: 'image', src: '/assets/map_bg.jpg' },
     },
 
     decorations: [
-      // Pine forest (top-left) — drawFn receives (ctx, x, y, scale, w, h)
-      ...[
-        [.03, .08], [.09, .07], [.15, .06], [.21, .07], [.27, .07],
-        [.01, .15], [.07, .14], [.13, .13], [.19, .13], [.25, .14], [.31, .14],
-        [.04, .21], [.10, .20], [.16, .19], [.22, .20], [.28, .21],
-        [.02, .27], [.08, .26], [.14, .25], [.20, .26],
-        [.05, .33], [.11, .32],
-      ].map(([fx, fy], i) => ({
-        id: `pine_${i}`,
-        position: { x: fx, y: fy },
-        scale: 1.0,
-        zIndex: 2,
-        drawFn(ctx, x, y, scale, w) { bigPine(ctx, x, y, w * .068 * scale); },
-      })),
-      // Scattered pines top-center (slightly smaller)
-      ...[
-        [.35, .08], [.40, .10], [.44, .08], [.48, .10],
-      ].map(([fx, fy], i) => ({
-        id: `pine_sm_${i}`,
-        position: { x: fx, y: fy },
-        scale: 0.75,
-        zIndex: 2,
-        drawFn(ctx, x, y, scale, w) { bigPine(ctx, x, y, w * .068 * scale); },
-      })),
-      // Round leafy trees
-      ...[
-        [.86, .10], [.91, .09], [.95, .12], [.88, .17], [.93, .20],
-        [.30, .42], [.35, .46], [.33, .50],
-        [.46, .84], [.52, .87], [.58, .85], [.64, .82], [.69, .78],
-        [.28, .72], [.32, .76],
-      ].map(([fx, fy], i) => ({
-        id: `tree_${i}`,
-        position: { x: fx, y: fy },
-        scale: 1.0,
-        zIndex: 3,
-        drawFn(ctx, x, y, scale, w) { roundTree(ctx, x, y, w * .042 * scale); },
-      })),
       // Drifting clouds — drawFn ignores x, computes position from Date.now()
       ...[
         { id: 'cloud_0', fy: .11, scale: .70, offset:     0, speed: 5.5e-6 },
@@ -772,6 +735,25 @@ function buildConfig(lang) {
           drawCloud(ctx, cx, y, w * .048 * scale);
         },
       })),
+      // Vignette + border overlay — drawn above clouds but below path/locations
+      {
+        id: 'vignette_overlay',
+        position: { x: 0, y: 0 },
+        scale: 1,
+        zIndex: 4.5,
+        drawFn(ctx, _x, _y, _s, w, h) {
+          const vg = ctx.createRadialGradient(w*.5, h*.5, h*.22, w*.5, h*.5, h*.78);
+          vg.addColorStop(0, 'rgba(155,100,18,0)');
+          vg.addColorStop(.65, 'rgba(128,78,14,0.08)');
+          vg.addColorStop(1, 'rgba(88,48,8,0.32)');
+          ctx.fillStyle = vg; ctx.fillRect(0, 0, w, h);
+          ctx.strokeStyle = '#7A5A28'; ctx.lineWidth = 5; ctx.strokeRect(3, 3, w-6, h-6);
+          ctx.strokeStyle = '#C0A040'; ctx.lineWidth = 1.8; ctx.strokeRect(9, 9, w-18, h-18);
+          [[12,12],[w-12,12],[12,h-12],[w-12,h-12]].forEach(([cx,cy]) => {
+            ctx.fillStyle = '#8B6A30'; ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, TWO_PI); ctx.fill();
+          });
+        },
+      },
     ],
 
     paths: {
