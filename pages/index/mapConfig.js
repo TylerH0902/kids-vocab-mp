@@ -545,6 +545,20 @@ function buildConfig(lang) {
         blob(ctx, w*.08, h*.72, w*.18, h*.14, 'rgba(75,115,25,.18)');
         blob(ctx, w*.88, h*.42, w*.16, h*.22, 'rgba(100,140,38,.16)');
 
+        // ── Forest shadows ──
+        // Top-left pine forest: dark shadow along south + east edges
+        blob(ctx, w*.14, h*.32, w*.22, h*.05, 'rgba(15,35,8,0.28)');
+        blob(ctx, w*.28, h*.20, w*.06, h*.18, 'rgba(15,35,8,0.22)');
+        blob(ctx, w*.08, h*.30, w*.14, h*.05, 'rgba(15,35,8,0.18)');
+        // Interior depth — pools of darkness under the canopy
+        blob(ctx, w*.10, h*.14, w*.08, h*.09, 'rgba(10,28,6,0.20)');
+        blob(ctx, w*.20, h*.12, w*.07, h*.08, 'rgba(10,28,6,0.18)');
+        blob(ctx, w*.06, h*.22, w*.07, h*.07, 'rgba(10,28,6,0.16)');
+        // Top-right leafy forest: dark shadow along south + left edges
+        blob(ctx, w*.89, h*.20, w*.10, h*.04, 'rgba(15,35,8,0.26)');
+        blob(ctx, w*.85, h*.14, w*.04, h*.10, 'rgba(15,35,8,0.20)');
+        blob(ctx, w*.92, h*.14, w*.06, h*.07, 'rgba(10,28,6,0.18)');
+
         // ── Forest hatching — diagonal strokes over the pine area (top-left) ──
         ctx.save();
         ctx.strokeStyle = 'rgba(38,62,20,0.11)'; ctx.lineWidth = 0.75;
@@ -622,6 +636,54 @@ function buildConfig(lang) {
           ctx.fillStyle='#60788A'; ctx.beginPath(); ctx.moveTo(px,py-ht); ctx.lineTo(px-s*.18,py-ht*.55); ctx.lineTo(px-s*1.15,py+s*.28); ctx.closePath(); ctx.fill();
           ctx.fillStyle='#EEF4F8'; ctx.beginPath(); ctx.moveTo(px,py-ht); ctx.lineTo(px-s*.38,py-ht*.62); ctx.lineTo(px+s*.32,py-ht*.60); ctx.closePath(); ctx.fill();
         }
+
+        // ── Mountain rock texture ──
+        // Hachure strokes on left slope of each peak
+        ctx.save();
+        ctx.strokeStyle = 'rgba(62,80,98,0.22)'; ctx.lineWidth = 0.6;
+        for (const [px, py, s, sf] of peaks) {
+          const ht = s * sf * 2.0;
+          for (let t = 0.20; t < 0.88; t += 0.095) {
+            // Walk down the left slope, draw short horizontal-ish strokes
+            const lx = px - s * 1.05 * (1 - t);
+            const ly = py - ht * (1 - t) + s * .22 * (1 - t);
+            const len = s * (0.18 + t * 0.08);
+            ctx.beginPath();
+            ctx.moveTo(lx, ly);
+            ctx.lineTo(lx + len, ly + len * 0.18);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+
+        // Curved contour lines wrapping around each peak
+        ctx.save();
+        ctx.strokeStyle = 'rgba(78,96,115,0.18)'; ctx.lineWidth = 0.7;
+        for (const [px, py, s, sf] of peaks) {
+          const ht = s * sf * 2.0;
+          for (let t = 0.30; t < 0.72; t += 0.17) {
+            const elev = ht * t;
+            const hw   = s * 1.0 * (1 - t * 0.65);
+            ctx.beginPath();
+            ctx.moveTo(px - hw, py - elev);
+            ctx.quadraticCurveTo(px - hw * 0.1, py - elev - s * 0.07, px + hw * 0.72, py - elev + s * 0.02);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+
+        // Scree / talus dots at mountain bases
+        ctx.save();
+        ctx.fillStyle = 'rgba(100,112,128,0.28)';
+        for (const [px, py, s] of peaks) {
+          for (let j = 0; j < 7; j++) {
+            const t  = (j / 6);
+            const sx = px - s * 0.95 + t * s * 1.70;
+            const sy = py + s * 0.14 + Math.sin(j * 2.3) * s * 0.06;
+            ctx.beginPath(); ctx.arc(sx, sy, s * 0.024, 0, TWO_PI); ctx.fill();
+          }
+        }
+        ctx.restore();
 
         // ── Mountain contour hatching (vintage topographic style) ──
         ctx.save();
