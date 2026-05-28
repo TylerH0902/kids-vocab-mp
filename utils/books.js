@@ -2,7 +2,7 @@ const BOOKS = [
   {
     id: "alice", emoji: "🐰",
     title_en: "Alice in Wonderland", title_zh: "爱丽丝梦游仙境",
-    sub_en: "Chapters 1–5 · 30 Qs",  sub_zh: "第1–5章 · 30题",
+    sub_en: "Chapters 1–5 · 30 Qs · 20/trail",  sub_zh: "第1–5章 · 30题 · 每次20题",
     chapters: ["alice", "alice2", "alice3"],
     questions: [
       {qid:"q0",q_en:"What did the White Rabbit have that first caught Alice's attention?",q_zh:"是什么让爱丽丝第一次注意到白兔？",opts:[{id:"q0_0",en:"A waistcoat and a pocket watch",zh:"一件背心和一块怀表",correct:true},{id:"q0_1",en:"A big bag of carrots",zh:"一大袋胡萝卜",correct:false},{id:"q0_2",en:"A red hat",zh:"一顶红帽子",correct:false},{id:"q0_3",en:"A storybook",zh:"一本故事书",correct:false}]},
@@ -96,7 +96,7 @@ const BOOKS = [
   {
     id: "caterpillar", emoji: "🐛",
     title_en: "The Very Hungry Caterpillar", title_zh: "好饿的毛毛虫",
-    sub_en: "30 Questions", sub_zh: "30题",
+    sub_en: "30 Qs · 20/trail", sub_zh: "30题 · 每次20题",
     questions: [
       {qid:"c0",q_en:"What did the caterpillar hatch from?",q_zh:"毛毛虫是从什么里孵出来的？",opts:[{id:"c0_0",en:"An egg",zh:"一颗卵",correct:true},{id:"c0_1",en:"A flower",zh:"一朵花",correct:false},{id:"c0_2",en:"A cocoon",zh:"一个茧",correct:false},{id:"c0_3",en:"A seed",zh:"一粒种子",correct:false}]},
       {qid:"c1",q_en:"Where was the egg at the start of the story?",q_zh:"故事开始时，卵在哪里？",opts:[{id:"c1_0",en:"On a leaf",zh:"在一片叶子上",correct:true},{id:"c1_1",en:"On a flower",zh:"在一朵花上",correct:false},{id:"c1_2",en:"In the grass",zh:"在草地上",correct:false},{id:"c1_3",en:"Under a tree",zh:"在树下",correct:false}]},
@@ -133,7 +133,7 @@ const BOOKS = [
   {
     id: "wildthings", emoji: "🦁",
     title_en: "Where the Wild Things Are", title_zh: "野兽国",
-    sub_en: "30 Questions", sub_zh: "30题",
+    sub_en: "30 Qs · 20/trail", sub_zh: "30题 · 每次20题",
     questions: [
       {qid:"w0",q_en:"What was Max wearing when the story began?",q_zh:"故事开始时，麦克斯穿着什么？",opts:[{id:"w0_0",en:"A wolf suit",zh:"狼的服装",correct:true},{id:"w0_1",en:"A monster costume",zh:"怪兽服装",correct:false},{id:"w0_2",en:"His pajamas",zh:"他的睡衣",correct:false},{id:"w0_3",en:"A superhero cape",zh:"超级英雄斗篷",correct:false}]},
       {qid:"w1",q_en:"What mischief did Max make?",q_zh:"麦克斯做了什么恶作剧？",opts:[{id:"w1_0",en:"He chased the dog with a fork",zh:"他用叉子追狗",correct:true},{id:"w1_1",en:"He broke a window",zh:"他打破了窗户",correct:false},{id:"w1_2",en:"He spilled his dinner",zh:"他打翻了晚餐",correct:false},{id:"w1_3",en:"He drew on the walls",zh:"他在墙上乱画",correct:false}]},
@@ -170,7 +170,7 @@ const BOOKS = [
   {
     id: "wonder", emoji: "⭐",
     title_en: "Wonder", title_zh: "奇迹男孩",
-    sub_en: "30 Questions", sub_zh: "30题",
+    sub_en: "30 Qs · 20/trail", sub_zh: "30题 · 每次20题",
     questions: [
       {qid:"wo0",q_en:"What is the name of the main character in Wonder?",q_zh:"《奇迹男孩》主人公叫什么名字？",opts:[{id:"wo0_0",en:"August Pullman",zh:"奥古斯特·普尔曼",correct:true},{id:"wo0_1",en:"Jack Will",zh:"杰克·威尔",correct:false},{id:"wo0_2",en:"Julian Albans",zh:"朱利安·阿尔班斯",correct:false},{id:"wo0_3",en:"Via Pullman",zh:"薇娅·普尔曼",correct:false}]},
       {qid:"wo1",q_en:"What makes Auggie different from the other kids at his new school?",q_zh:"奥古斯特和新学校其他同学有什么不同？",opts:[{id:"wo1_0",en:"He was born with a facial difference",zh:"他天生有面部差异",correct:true},{id:"wo1_1",en:"He uses a wheelchair",zh:"他坐轮椅",correct:false},{id:"wo1_2",en:"He cannot speak",zh:"他不会说话",correct:false},{id:"wo1_3",en:"He is extremely tall",zh:"他非常高",correct:false}]},
@@ -207,7 +207,7 @@ const BOOKS = [
   {
     id: "charlotteweb", emoji: "🕷️",
     title_en: "Charlotte's Web", title_zh: "夏洛的网",
-    sub_en: "30 Questions", sub_zh: "30题",
+    sub_en: "30 Qs · 20/trail", sub_zh: "30题 · 每次20题",
     questions: [
       {qid:"cw0",q_en:"What kind of animal is Wilbur?",q_zh:"威尔伯是什么动物？",opts:[{id:"cw0_0",en:"A pig",zh:"一头猪",correct:true},{id:"cw0_1",en:"A sheep",zh:"一只羊",correct:false},{id:"cw0_2",en:"A rabbit",zh:"一只兔子",correct:false},{id:"cw0_3",en:"A goat",zh:"一只山羊",correct:false}]},
       {qid:"cw1",q_en:"Why was Wilbur nearly killed at the start of the story?",q_zh:"故事开始时，威尔伯为什么差点被杀？",opts:[{id:"cw1_0",en:"He was the runt of the litter",zh:"他是这窝猪里最小的",correct:true},{id:"cw1_1",en:"He was too noisy",zh:"他太吵了",correct:false},{id:"cw1_2",en:"He was sick",zh:"他生病了",correct:false},{id:"cw1_3",en:"There was no room in the barn",zh:"猪圈里没有地方了",correct:false}]},
@@ -244,7 +244,7 @@ const BOOKS = [
   {
     id: "gruffalo", emoji: "🐾",
     title_en: "The Gruffalo", title_zh: "咕噜牛",
-    sub_en: "50 Questions", sub_zh: "50题",
+    sub_en: "50 Qs · 20/trail", sub_zh: "50题 · 每次20题",
     questions: [
       {qid:"gr0",q_en:"Where does the story of The Gruffalo take place?",q_zh:"《咕噜牛》的故事发生在哪里？",opts:[{id:"gr0_0",en:"In a deep dark wood",zh:"在一片黑黑的树林里",correct:true},{id:"gr0_1",en:"On a sunny hill",zh:"在一座阳光明媚的山上",correct:false},{id:"gr0_2",en:"In a big city",zh:"在一座大城市里",correct:false},{id:"gr0_3",en:"By the seaside",zh:"在海边",correct:false}]},
       {qid:"gr1",q_en:"Who is the main character in The Gruffalo?",q_zh:"《咕噜牛》的主人公是谁？",opts:[{id:"gr1_0",en:"A mouse",zh:"一只老鼠",correct:true},{id:"gr1_1",en:"A fox",zh:"一只狐狸",correct:false},{id:"gr1_2",en:"A rabbit",zh:"一只兔子",correct:false},{id:"gr1_3",en:"A squirrel",zh:"一只松鼠",correct:false}]},
