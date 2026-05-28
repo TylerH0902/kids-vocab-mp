@@ -60,6 +60,39 @@ function drawRibbon(ctx, x, y, text, color, w) {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, x, y);
 }
 
+// ── Side-quest portal draw function ──────────────────────────────────────
+
+function drawSideQuestPortal(ctx, x, y, s) {
+  // Ground shadow
+  blob(ctx, x, y + s * .50, s * .80, s * .22, 'rgba(60,0,80,.22)');
+  // Left pillar
+  ctx.fillStyle = '#7858A8';
+  ctx.fillRect(x - s * .54, y - s * .70, s * .20, s * 1.10);
+  // Right pillar
+  ctx.fillRect(x + s * .34, y - s * .70, s * .20, s * 1.10);
+  // Arch top
+  ctx.lineWidth = s * .22; ctx.strokeStyle = '#7858A8';
+  ctx.beginPath(); ctx.arc(x, y - s * .70, s * .44, Math.PI, 0); ctx.stroke();
+  // Portal glow fill
+  const pg = ctx.createRadialGradient(x, y - s * .20, 0, x, y - s * .20, s * .55);
+  pg.addColorStop(0, '#F0E0FF'); pg.addColorStop(.4, '#B06ED8'); pg.addColorStop(1, '#3A1060');
+  ctx.fillStyle = pg;
+  ctx.beginPath(); ctx.ellipse(x, y - s * .20, s * .36, s * .54, 0, 0, TWO_PI); ctx.fill();
+  // Gold sparkles around arch
+  ctx.fillStyle = '#FFD700'; ctx.shadowColor = '#FFD700'; ctx.shadowBlur = s * .4;
+  [[-0.26, -0.92], [0.30, -0.88], [-0.48, -0.55], [0.44, -0.50]].forEach(([dx, dy]) => {
+    ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s, s * .07, 0, TWO_PI); ctx.fill();
+  });
+  ctx.shadowBlur = 0;
+  // "?" in portal
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,.90)';
+  ctx.font = `bold ${Math.round(s * .58)}px sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('?', x, y - s * .22);
+  ctx.restore();
+}
+
 // ── Location draw functions ───────────────────────────────────────────────
 
 function drawCottage(ctx, x, y, s) {
@@ -912,6 +945,39 @@ function buildConfig(lang) {
         animations: { idle: null, onTap: null },
         banner: {
           drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 1.05, label('Story School', '故事学院'), '#8C6020', w); },
+        },
+      },
+      // ── Side quest portals (not part of main quest chain) ──────────────
+      {
+        id: 'sq_hub_1',
+        label: label('Side Quest I', '支线任务 I'),
+        position: { x: .37, y: .46 },
+        scale: 0.85,
+        zIndex: 6,
+        hitRadius: .11,
+        state: 'locked',
+        contentRef: null,
+        color: '#7858A8',
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; drawSideQuestPortal(ctx, x, y, s); },
+        animations: { idle: null, onTap: null },
+        banner: {
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 0.85 * 1.05, label('Side Quest I', '支线任务 I'), '#7858A8', w); },
+        },
+      },
+      {
+        id: 'sq_hub_2',
+        label: label('Side Quest II', '支线任务 II'),
+        position: { x: .92, y: .24 },
+        scale: 0.85,
+        zIndex: 6,
+        hitRadius: .11,
+        state: 'locked',
+        contentRef: null,
+        color: '#7858A8',
+        drawFn(ctx, x, y, scale, w) { const s = w * .071 * scale; drawSideQuestPortal(ctx, x, y, s); },
+        animations: { idle: null, onTap: null },
+        banner: {
+          drawFn(ctx, x, y, w) { drawRibbon(ctx, x, y + w * .071 * 0.85 * 1.05, label('Side Quest II', '支线任务 II'), '#7858A8', w); },
         },
       },
     ],

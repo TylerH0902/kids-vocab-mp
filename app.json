@@ -7,7 +7,8 @@
     "pages/result/result",
     "pages/profile/profile",
     "pages/game/game",
-    "pages/spell/spell"
+    "pages/spell/spell",
+    "pages/sidequest/sidequest"
   ],
   "window": {
     "backgroundTextStyle": "light",

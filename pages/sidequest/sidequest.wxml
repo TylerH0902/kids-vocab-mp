@@ -1,0 +1,40 @@
+<view class="page">
+
+  <view class="lang-row">
+    <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+    <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+  </view>
+
+  <view class="header">
+    <text class="portal-icon">🔮</text>
+    <text class="title">{{title}}</text>
+    <text class="subtitle">{{subtitle}}</text>
+  </view>
+
+  <view class="book-list">
+    <view
+      wx:for="{{books}}"
+      wx:key="id"
+      class="book-card"
+      bindtap="onBookTap"
+      data-id="{{item.id}}"
+    >
+      <text class="book-emoji">{{item.emoji}}</text>
+      <view class="book-info">
+        <text class="book-title">{{item.title}}</text>
+        <text class="book-sub">{{item.sub}}</text>
+        <view class="stars-row" wx:if="{{item.attempts > 0}}">
+          <text class="star {{item.stars>=1?'lit':''}}">★</text>
+          <text class="star {{item.stars>=2?'lit':''}}">★</text>
+          <text class="star {{item.stars>=3?'lit':''}}">★</text>
+          <text class="best-text">{{item.bestText}}</text>
+        </view>
+        <text class="new-badge" wx:else>NEW</text>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <button class="btn-back" bindtap="goBack">{{backLabel}}</button>
+
+</view>

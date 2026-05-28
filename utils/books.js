@@ -39,6 +39,7 @@ const BOOKS = [
   },
   {
     id: "alice2", emoji: "🐱",
+    sideQuest: true,
     title_en: "Alice in Wonderland", title_zh: "爱丽丝梦游仙境",
     sub_en: "Chapters 6–9 · 20 Qs",  sub_zh: "第6–9章 · 20题",
     questions: [
@@ -66,6 +67,7 @@ const BOOKS = [
   },
   {
     id: "alice3", emoji: "🃏",
+    sideQuest: true,
     title_en: "Alice in Wonderland", title_zh: "爱丽丝梦游仙境",
     sub_en: "Chapters 10–12 · 20 Qs", sub_zh: "第10–12章 · 20题",
     questions: [

@@ -4,6 +4,12 @@ const progress = require('../../utils/progress');
 const { MapEngine }   = require('../../utils/mapEngine/MapEngine');
 const { buildConfig } = require('./mapConfig');
 
+// Side-quest portals: unlockAfterCount = unlockedCount threshold required
+const SQ_HUBS = [
+  { locId: 'sq_hub_1', unlockAfterCount: 4 },  // after completing checkpoint 3
+  { locId: 'sq_hub_2', unlockAfterCount: 6 },  // after completing checkpoint 5
+];
+
 // Ordered unlock sequence — completing index N unlocks index N+1
 const CHECKPOINT_ORDER = [
   { locId: 'gruffalo_wood',    bookId: BOOKS[7].id },
@@ -118,10 +124,21 @@ Page({
   _onLocationTap(loc) {
     if (loc.state === 'locked') {
       const { lang, mode } = this.data;
-      const msg = mode === 'quest'
-        ? (lang === 'en' ? 'Score 80%+ on the previous stop to unlock!' : '需在上一站得分80%以上才能解锁！')
-        : (lang === 'en' ? 'Finish the previous story first!' : '请先完成前一个故事！');
+      const isSQHub = SQ_HUBS.some(h => h.locId === loc.id);
+      let msg;
+      if (isSQHub) {
+        msg = lang === 'en' ? 'Clear more checkpoints to unlock this portal!' : '完成更多关卡即可解锁此传送门！';
+      } else {
+        msg = mode === 'quest'
+          ? (lang === 'en' ? 'Score 80%+ on the previous stop to unlock!' : '需在上一站得分80%以上才能解锁！')
+          : (lang === 'en' ? 'Finish the previous story first!' : '请先完成前一个故事！');
+      }
       wx.showToast({ title: msg, icon: 'none', duration: 2200 });
+      return;
+    }
+    // Side quest portals
+    if (SQ_HUBS.some(h => h.locId === loc.id)) {
+      wx.navigateTo({ url: '/pages/sidequest/sidequest' });
       return;
     }
     const book = {
@@ -201,7 +218,12 @@ Page({
     if (!this._config) return;
     this._config.locations.forEach(loc => {
       const order = CHECKPOINT_ORDER.findIndex(c => c.locId === loc.id);
-      if (order !== -1) loc.state = order < unlockedCount ? 'unlocked' : 'locked';
+      if (order !== -1) {
+        loc.state = order < unlockedCount ? 'unlocked' : 'locked';
+      } else {
+        const hub = SQ_HUBS.find(h => h.locId === loc.id);
+        if (hub) loc.state = unlockedCount >= hub.unlockAfterCount ? 'unlocked' : 'locked';
+      }
     });
   },
 
