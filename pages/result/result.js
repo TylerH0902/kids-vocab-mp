@@ -1,6 +1,7 @@
 const { t }        = require('../../utils/i18n');
 const progress     = require('../../utils/progress');
 const BOOKS        = require('../../utils/books');
+const achievements = require('../../utils/achievements');
 
 const CHECKPOINT_IDS = new Set([
   BOOKS[0].id, BOOKS[3].id, BOOKS[4].id, BOOKS[5].id, BOOKS[6].id, BOOKS[7].id, BOOKS[8].id,
@@ -14,10 +15,12 @@ Page({
     confetti: [],
     showQuestBanner: false, questPassed: false, questBannerText: '',
     showNewQuestBtn: false, newQuestLabel: '',
+    achToast: '', showAchToast: false, achBalance: 0,
   },
 
   _opts: null,
   _questComplete: false,
+  _newAch: null,
 
   onLoad(options) {
     this._opts = options;
@@ -32,6 +35,16 @@ Page({
       } else if (mode === 'quest') {
         this._questComplete = progress.getQuestState().questComplete;
       }
+
+      // Achievement check after saveResult
+      const isSQ = !!(BOOKS.find(b => b.id === options.bookId) || {}).sideQuest;
+      this._newAch = achievements.checkBookComplete(
+        options.bookId,
+        parseInt(options.correct) || 0,
+        parseInt(options.total) || 1,
+        options.lang || wx.getStorageSync('lang') || 'en',
+        isSQ
+      );
     }
     const lang = options.lang || wx.getStorageSync('lang') || 'en';
     this._render(lang);
@@ -72,6 +85,9 @@ Page({
             : `⚔️ 需要80%解锁下一站，你得了${pct}%，再试一次！`);
     }
 
+    const hasAch = !!(this._newAch && this._newAch.length > 0);
+    const firstAch = hasAch ? this._newAch[0] : null;
+
     this.setData({
       lang,
       emoji,
@@ -84,6 +100,11 @@ Page({
       showQuestBanner, questPassed, questBannerText,
       showNewQuestBtn: !!(this._questComplete),
       newQuestLabel:   lang === 'en' ? '🗺️ Start New Quest' : '🗺️ 开始新旅程',
+      achToast:       hasAch
+        ? `🏆 ${lang === 'en' ? firstAch.title_en : firstAch.title_zh} +${firstAch.pts}pts`
+        : '',
+      showAchToast:   hasAch,
+      achBalance:     achievements.getBalance(),
     });
   },
 
@@ -110,6 +131,7 @@ Page({
   },
 
   startNewQuest() {
+    achievements.checkNewQuest();
     progress.startNewQuest();
     wx.navigateBack();
   },

@@ -8,7 +8,8 @@
     "pages/profile/profile",
     "pages/game/game",
     "pages/spell/spell",
-    "pages/sidequest/sidequest"
+    "pages/sidequest/sidequest",
+    "pages/achievements/achievements"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -24,6 +24,7 @@
         <view class="mode-btn {{mode==='trial'?'active':''}}" bindtap="setMode" data-val="trial">🌟 Trial</view>
       </view>
       <view class="profile-btn" bindtap="goProfile">👤</view>
+      <view class="ach-btn" bindtap="goAchievements">🏆</view>
     </view>
   </view>
 

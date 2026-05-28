@@ -28,6 +28,13 @@
     <text class="quest-banner-text">{{questBannerText}}</text>
   </view>
 
+  <view class="ach-toast" wx:if="{{showAchToast}}">
+    <text class="ach-toast-text">{{achToast}}</text>
+  </view>
+  <view class="ach-balance" wx:if="{{achBalance > 0}}">
+    <text class="ach-balance-text">⭐ {{achBalance}} pts</text>
+  </view>
+
   <button class="btn-primary action-btn" bindtap="playAgain">{{playAgainLabel}}</button>
   <button wx:if="{{showNewQuestBtn}}" class="btn-new-quest action-btn" bindtap="startNewQuest">{{newQuestLabel}}</button>
   <button class="btn-secondary action-btn" bindtap="goHome">{{homeLabel}}</button>

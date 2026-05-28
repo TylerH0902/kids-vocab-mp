@@ -1,0 +1,58 @@
+<view class="page">
+
+  <!-- Lang toggle -->
+  <view class="lang-row">
+    <view class="lang-btn {{lang==='en'?'active':''}}" bindtap="setLang" data-val="en">EN</view>
+    <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
+  </view>
+
+  <!-- Header -->
+  <view class="header">
+    <text class="header-icon">🏆</text>
+    <text class="header-title">{{lang==='en'?'Achievements':'成就'}}</text>
+  </view>
+
+  <!-- Stats bar -->
+  <view class="stats-bar">
+    <view class="stat-item">
+      <text class="stat-value">⭐ {{balance}}</text>
+      <text class="stat-label">{{lang==='en'?'pts available':'积分可用'}}</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{earnedCount}} / {{totalCount}}</text>
+      <text class="stat-label">{{lang==='en'?'earned':'已获得'}}</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{totalEarned}}</text>
+      <text class="stat-label">{{lang==='en'?'total pts':'累计积分'}}</text>
+    </view>
+  </view>
+
+  <!-- Categories -->
+  <view wx:for="{{categories}}" wx:key="id" class="category">
+    <view class="cat-header">
+      <text class="cat-label">{{item.label}}</text>
+      <text class="cat-count">{{item.items.length}}</text>
+    </view>
+    <view class="ach-grid">
+      <view
+        wx:for="{{item.items}}"
+        wx:for-item="ach"
+        wx:key="id"
+        class="ach-card {{ach.earned?'earned':'locked'}}"
+      >
+        <text class="ach-icon">{{ach.icon}}</text>
+        <text class="ach-title">{{ach.title}}</text>
+        <text class="ach-desc">{{ach.desc}}</text>
+        <view class="ach-pts-wrap">
+          <text class="ach-pts">+{{ach.pts}} pts</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <button class="btn-back" bindtap="goBack">{{lang==='en'?'← Back':'← 返回'}}</button>
+
+</view>

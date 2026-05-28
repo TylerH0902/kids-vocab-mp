@@ -1,6 +1,7 @@
-const BOOKS    = require('../../utils/books');
-const auth     = require('../../utils/auth');
-const progress = require('../../utils/progress');
+const BOOKS        = require('../../utils/books');
+const auth         = require('../../utils/auth');
+const progress     = require('../../utils/progress');
+const achievements = require('../../utils/achievements');
 const { MapEngine }   = require('../../utils/mapEngine/MapEngine');
 const { buildConfig } = require('./mapConfig');
 
@@ -107,6 +108,7 @@ Page({
         this._config = config;
       }
     }
+    achievements.checkLogin();
     this._applyProgress();
     this._engine && this._engine.resume();
   },
@@ -117,6 +119,10 @@ Page({
 
   goProfile() {
     wx.navigateTo({ url: '/pages/profile/profile' });
+  },
+
+  goAchievements() {
+    wx.navigateTo({ url: '/pages/achievements/achievements' });
   },
 
   // ── Location tap ──────────────────────────────────────────────────────────
@@ -240,6 +246,12 @@ Page({
       }
     }
     this._unlockedCount = unlockedCount;
+
+    // Achievement hooks
+    achievements.checkQuestUnlock(unlockedCount);
+    if (unlockedCount >= 7) {
+      achievements.checkQuestComplete(progress.getQuestState().questNumber);
+    }
 
     this._setLocationStates(unlockedCount);
     this._config.locations.forEach(loc => {

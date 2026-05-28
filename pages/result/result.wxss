@@ -74,3 +74,12 @@
   color: #fff;
   box-shadow: 0 6rpx 20rpx rgba(124,58,237,.35);
 }
+
+.ach-toast {
+  background: linear-gradient(135deg, #FFD700, #FF9500);
+  border-radius: 16rpx; padding: 16rpx 24rpx;
+  width: 100%; text-align: center;
+}
+.ach-toast-text { font-size: 28rpx; font-weight: 800; color: #fff; }
+.ach-balance { text-align: center; }
+.ach-balance-text { font-size: 26rpx; color: #FFD700; font-weight: 700; }

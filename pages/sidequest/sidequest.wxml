@@ -5,6 +5,11 @@
     <view class="lang-btn {{lang==='zh'?'active':''}}" bindtap="setLang" data-val="zh">中</view>
   </view>
 
+  <view class="balance-bar">
+    <text class="balance-text">{{balanceText}}</text>
+    <view class="btn-achievements" bindtap="goAchievements">🏆 {{lang==='en'?'Achievements':'成就'}}</view>
+  </view>
+
   <view class="header">
     <text class="portal-icon">🔮</text>
     <text class="title">{{title}}</text>
@@ -15,7 +20,7 @@
     <view
       wx:for="{{books}}"
       wx:key="id"
-      class="book-card"
+      class="book-card {{item.unlocked?'unlocked':'locked-card'}}"
       bindtap="onBookTap"
       data-id="{{item.id}}"
     >
@@ -23,15 +28,21 @@
       <view class="book-info">
         <text class="book-title">{{item.title}}</text>
         <text class="book-sub">{{item.sub}}</text>
-        <view class="stars-row" wx:if="{{item.attempts > 0}}">
+        <view class="stars-row" wx:if="{{item.unlocked && item.attempts > 0}}">
           <text class="star {{item.stars>=1?'lit':''}}">★</text>
           <text class="star {{item.stars>=2?'lit':''}}">★</text>
           <text class="star {{item.stars>=3?'lit':''}}">★</text>
           <text class="best-text">{{item.bestText}}</text>
         </view>
-        <text class="new-badge" wx:else>NEW</text>
+        <text class="new-badge" wx:elif="{{item.unlocked}}">NEW</text>
+        <view class="cost-row" wx:else>
+          <text class="cost-text">🔒 {{item.cost}} pts</text>
+        </view>
       </view>
-      <text class="arrow">›</text>
+      <button wx:if="{{!item.unlocked}}" class="btn-unlock {{item.canAfford?'':'btn-unlock-dim'}}" catchtap="onUnlockTap" data-id="{{item.id}}">
+        {{item.canAfford ? (lang==='en'?'Unlock':'解锁') : (lang==='en'?'Earn more':'积分不足')}}
+      </button>
+      <text class="arrow" wx:else>›</text>
     </view>
   </view>
 
