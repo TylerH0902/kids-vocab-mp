@@ -20,7 +20,7 @@ class HitDetector {
   find(tapX, tapY, assets, canvasSize) {
     const { w, h } = canvasSize;
     for (const loc of this._sorted) {
-      if (loc.state === 'locked') continue;
+      if (loc.state === 'locked' || loc.state === 'hidden') continue;
       const x = loc.position.x * w;
       const y = loc.position.y * h;
 

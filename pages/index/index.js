@@ -222,7 +222,7 @@ Page({
         loc.state = order < unlockedCount ? 'unlocked' : 'locked';
       } else {
         const hub = SQ_HUBS.find(h => h.locId === loc.id);
-        if (hub) loc.state = unlockedCount >= hub.unlockAfterCount ? 'unlocked' : 'locked';
+        if (hub) loc.state = unlockedCount >= hub.unlockAfterCount ? 'unlocked' : 'hidden';
       }
     });
   },

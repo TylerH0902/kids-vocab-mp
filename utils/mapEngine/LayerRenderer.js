@@ -83,6 +83,7 @@ class LayerRenderer {
     return {
       zIndex: loc.zIndex,
       draw(ctx) {
+        if (loc.state === 'hidden') return;
         const x = loc.position.x * w, y = loc.position.y * h;
 
         // Pulsing glow — only for available (unlocked) locations
@@ -164,6 +165,7 @@ class LayerRenderer {
     return {
       zIndex: loc.zIndex + 1,
       draw(ctx) {
+        if (loc.state === 'hidden') return;
         if (loc.banner && loc.banner.drawFn) {
           loc.banner.drawFn(ctx, loc.position.x * w, loc.position.y * h, w, h);
         }
