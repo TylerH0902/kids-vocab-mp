@@ -29,6 +29,7 @@
   </view>
 
   <button class="btn-primary action-btn" bindtap="playAgain">{{playAgainLabel}}</button>
+  <button wx:if="{{showNewQuestBtn}}" class="btn-new-quest action-btn" bindtap="startNewQuest">{{newQuestLabel}}</button>
   <button class="btn-secondary action-btn" bindtap="goHome">{{homeLabel}}</button>
 
 </view>

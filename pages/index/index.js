@@ -176,11 +176,22 @@ Page({
   _getUnlockedCount() {
     if (!auth.isLoggedIn()) return 1;
     const mode = wx.getStorageSync('mode') || 'quest';
+
+    if (mode === 'quest') {
+      const completed = progress.getQuestState().completedInQuest;
+      let count = 1;
+      for (let i = 0; i < CHECKPOINT_ORDER.length; i++) {
+        if (!completed.includes(CHECKPOINT_ORDER[i].bookId)) break;
+        count = i + 2;
+      }
+      return Math.min(count, CHECKPOINT_ORDER.length);
+    }
+
+    // story mode: any attempt unlocks next
     let count = 1;
     for (let i = 0; i < CHECKPOINT_ORDER.length; i++) {
       const p = progress.getBook(CHECKPOINT_ORDER[i].bookId);
       if (!p || p.attempts === 0) break;
-      if (mode === 'quest' && (p.bestScore / p.bestTotal) < 0.8) break;
       count = i + 2;
     }
     return Math.min(count, CHECKPOINT_ORDER.length);

@@ -13,14 +13,25 @@ Page({
     playAgainLabel: '', homeLabel: '',
     confetti: [],
     showQuestBanner: false, questPassed: false, questBannerText: '',
+    showNewQuestBtn: false, newQuestLabel: '',
   },
 
   _opts: null,
+  _questComplete: false,
 
   onLoad(options) {
     this._opts = options;
     if (options.gameType === 'book' && options.bookId) {
       progress.saveResult(options.bookId, parseInt(options.correct) || 0, parseInt(options.total) || 1);
+
+      const mode = wx.getStorageSync('mode') || 'quest';
+      const pct  = Math.round((parseInt(options.correct) || 0) / (parseInt(options.total) || 1) * 100);
+      if (mode === 'quest' && pct >= 80 && CHECKPOINT_IDS.has(options.bookId)) {
+        const state = progress.completeCheckpoint(options.bookId);
+        this._questComplete = state.questComplete;
+      } else if (mode === 'quest') {
+        this._questComplete = progress.getQuestState().questComplete;
+      }
     }
     const lang = options.lang || wx.getStorageSync('lang') || 'en';
     this._render(lang);
@@ -71,6 +82,8 @@ Page({
       homeLabel:      t(lang, 'backHome'),
       confetti,
       showQuestBanner, questPassed, questBannerText,
+      showNewQuestBtn: !!(this._questComplete),
+      newQuestLabel:   lang === 'en' ? '🗺️ Start New Quest' : '🗺️ 开始新旅程',
     });
   },
 
@@ -93,6 +106,11 @@ Page({
   },
 
   goHome() {
+    wx.navigateBack();
+  },
+
+  startNewQuest() {
+    progress.startNewQuest();
     wx.navigateBack();
   },
 });

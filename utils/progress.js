@@ -1,6 +1,8 @@
 const auth = require('./auth');
 
-const KEY_PREFIX = 'progress_';
+const KEY_PREFIX   = 'progress_';
+const QUEST_PREFIX = 'quest_';
+const TOTAL_CHECKPOINTS = 7;
 
 function _uid() {
   const p = auth.getUserProfile();
@@ -55,4 +57,48 @@ function getAll() {
   return _load(_uid());
 }
 
-module.exports = { saveResult, getBook, getStars, getAll };
+// ── Quest state ───────────────────────────────────────────────────────────────
+
+function _loadQuest(uid) {
+  try {
+    return wx.getStorageSync(QUEST_PREFIX + uid) ||
+           { questNumber: 1, completedInQuest: [], questComplete: false };
+  } catch(e) {
+    return { questNumber: 1, completedInQuest: [], questComplete: false };
+  }
+}
+
+function _saveQuest(uid, state) {
+  try { wx.setStorageSync(QUEST_PREFIX + uid, state); } catch(e) {}
+}
+
+function getQuestState() {
+  return _loadQuest(_uid());
+}
+
+// Call when a checkpoint is passed (80%+) in quest mode. Returns updated state.
+function completeCheckpoint(bookId) {
+  const uid   = _uid();
+  const state = _loadQuest(uid);
+  if (!state.completedInQuest.includes(bookId)) {
+    state.completedInQuest.push(bookId);
+  }
+  if (state.completedInQuest.length >= TOTAL_CHECKPOINTS) {
+    state.questComplete = true;
+  }
+  _saveQuest(uid, state);
+  return state;
+}
+
+// Reset quest progress, increment quest number. Returns updated state.
+function startNewQuest() {
+  const uid   = _uid();
+  const state = _loadQuest(uid);
+  state.questNumber     += 1;
+  state.completedInQuest = [];
+  state.questComplete    = false;
+  _saveQuest(uid, state);
+  return state;
+}
+
+module.exports = { saveResult, getBook, getStars, getAll, getQuestState, completeCheckpoint, startNewQuest };
