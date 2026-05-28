@@ -1,6 +1,8 @@
 const BOOKS = require('../../utils/books');
 const { t }  = require('../../utils/i18n');
 
+const QUEST_SIZE = 20;   // questions drawn per trail from the full pool
+
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -51,8 +53,8 @@ Page({
       bookId:      book.id,
       bookTitle:   lang === 'en' ? book.title_en : book.title_zh,
       bookEmoji:   book.emoji,
-      questions:   book.questions,
-      total:       book.questions.length,
+      questions:   shuffle(book.questions).slice(0, Math.min(QUEST_SIZE, book.questions.length)),
+      total:       Math.min(QUEST_SIZE, book.questions.length),
       replayLabel: lang === 'en' ? 'Replay' : '重播',
       nextLabel:   lang === 'en' ? 'Next' : '下一题',
       doneLabel:   lang === 'en' ? 'Done' : '完成',
