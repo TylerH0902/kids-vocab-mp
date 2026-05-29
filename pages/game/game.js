@@ -133,7 +133,7 @@ Page({
 
   _speak(wordId, lang) {
     const ctx = wx.createInnerAudioContext();
-    ctx.src   = `/audio/${lang}/${wordId}.mp3`;
+    ctx.src   = `https://tylerh0902.github.io/kids-vocab-audio/${lang}/${wordId}.mp3`;
     ctx.play();
     ctx.onError(() => {
       // Fallback: no TTS in Mini Program without cloud function; silently ignore
