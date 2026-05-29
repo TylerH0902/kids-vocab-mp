@@ -1,12 +1,33 @@
 .page {
   min-height: 100vh;
-  background: linear-gradient(160deg, #1A0A2E 0%, #2D1B4E 50%, #1A0A2E 100%);
   padding: 30rpx 32rpx 60rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20rpx;
+  position: relative;
 }
+
+.bg-image {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+.bg-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(15, 5, 30, 0.68);
+  z-index: 1;
+}
+
+.lang-row,
+.balance-bar,
+.header,
+.book-list,
+.btn-back { position: relative; z-index: 2; }
 
 .lang-row { display: flex; gap: 12rpx; align-self: flex-end; }
 .lang-btn {
