@@ -143,8 +143,10 @@ Page({
       return;
     }
     // Side quest portals
-    if (SQ_HUBS.some(h => h.locId === loc.id)) {
-      wx.navigateTo({ url: '/pages/sidequest/sidequest' });
+    const sqHub = SQ_HUBS.find(h => h.locId === loc.id);
+    if (sqHub) {
+      const hubNum = loc.id === 'sq_hub_1' ? 1 : 2;
+      wx.navigateTo({ url: `/pages/sidequest/sidequest?hub=${hubNum}` });
       return;
     }
     const book = {

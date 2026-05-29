@@ -1,6 +1,6 @@
 <view class="page">
 
-  <image class="bg-image" src="/assets/images/sq1_map.jpg" mode="aspectFill" />
+  <image class="bg-image" src="{{bgImage}}" mode="aspectFill" />
   <view class="bg-overlay" />
 
   <view class="lang-row">

@@ -4,6 +4,11 @@ const achievements = require('../../utils/achievements');
 
 const SIDE_QUEST_BOOKS = BOOKS.filter(b => b.sideQuest);
 
+const HUB_BG = {
+  1: '/assets/images/sq1_map.jpg',
+  2: '/assets/images/sq2_map.jpg',
+};
+
 Page({
   data: {
     lang: 'en',
@@ -14,9 +19,13 @@ Page({
     balance: 0,
     balanceText: '',
     costText: '',
+    bgImage: '/assets/images/sq1_map.jpg',
   },
 
-  onLoad() {
+  _hub: 1,
+
+  onLoad(options) {
+    this._hub = parseInt(options.hub) || 1;
     const lang = wx.getStorageSync('lang') || 'en';
     this._render(lang);
   },
@@ -56,6 +65,7 @@ Page({
       costText:    lang === 'en'
         ? `${achievements.SIDE_QUEST_COST} pts to unlock`
         : `${achievements.SIDE_QUEST_COST}积分解锁`,
+      bgImage: HUB_BG[this._hub] || HUB_BG[1],
     });
   },
 
