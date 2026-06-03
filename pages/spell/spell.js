@@ -1,6 +1,8 @@
 const { buildSpellPool } = require('../../utils/game');
 const { fetchWordImage }  = require('../../utils/pixabay');
-const { t } = require('../../utils/i18n');
+const { t }               = require('../../utils/i18n');
+const achievements        = require('../../utils/achievements');
+const progress            = require('../../utils/progress');
 
 Page({
   data: {
@@ -24,6 +26,8 @@ Page({
     checkLabel:  'Check',
     nextLabel:   'Next →',
     homeLabel:   'Home',
+    statPoints:    0,
+    statCompleted: 0,
   },
 
   onLoad(options) {
@@ -41,6 +45,11 @@ Page({
       checkLabel:  t(lang, 'check'),
       nextLabel:   t(lang, 'next'),
       homeLabel:   t(lang, 'backHome'),
+    });
+
+    this.setData({
+      statPoints:    achievements.getBalance(),
+      statCompleted: progress.getQuestState().completedInQuest.length,
     });
 
     this._loadQuestion(0);
@@ -105,10 +114,17 @@ Page({
   },
 
   _speak(wordId, lang) {
+    if (this._audioCtx) {
+      this._audioCtx.stop();
+      this._audioCtx.destroy();
+      this._audioCtx = null;
+    }
     const ctx = wx.createInnerAudioContext();
-    ctx.src   = `https://tylerh0902.github.io/kids-vocab-audio/${lang}/${wordId}.mp3`;
+    this._audioCtx = ctx;
+    ctx.src = `https://tylerh0902.github.io/kids-vocab-audio/${lang}/${wordId}.mp3`;
     ctx.play();
-    ctx.onError(() => {});
+    ctx.onEnded(() => { this._audioCtx = null; ctx.destroy(); });
+    ctx.onError(()  => { this._audioCtx = null; ctx.destroy(); });
   },
 
   goHome() {

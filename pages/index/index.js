@@ -49,7 +49,8 @@ function bezierPt(p0, cp, p1, t) {
 }
 
 Page({
-  data: { lang: 'en', mode: 'quest', hintVisible: true, hintText: '', canvasReady: false },
+  data: { lang: 'en', mode: 'quest', hintVisible: true, hintText: '', canvasReady: false,
+          statPoints: 0, statCompleted: 0, statPct: 0 },
   _engine: null,
   _config: null,
   _unlockedCount: null,   // null = not yet initialised; set on first _applyProgress
@@ -110,7 +111,18 @@ Page({
     }
     achievements.checkLogin();
     this._applyProgress();
+    this._refreshStats();
     this._engine && this._engine.resume();
+  },
+
+  _refreshStats() {
+    const completed = progress.getQuestState().completedInQuest.length;
+    const points    = achievements.getBalance();
+    this.setData({
+      statPoints:    points,
+      statCompleted: completed,
+      statPct:       Math.round((completed / 7) * 100),
+    });
   },
 
   onUnload() {

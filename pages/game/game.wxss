@@ -127,3 +127,17 @@
 /* Back */
 .back-row { margin-top: 16rpx; text-align: center; }
 .back-btn { color: #999; font-size: 26rpx; }
+
+/* Stats strip */
+.stat-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx;
+  margin-top: 24rpx;
+  padding: 18rpx 32rpx;
+  background: rgba(108,99,255,0.08);
+  border-radius: 20rpx;
+}
+.strip-item { font-size: 26rpx; color: #6C63FF; font-weight: 700; }
+.strip-dot  { width: 8rpx; height: 8rpx; border-radius: 50%; background: #6C63FF; opacity: 0.35; flex-shrink: 0; }

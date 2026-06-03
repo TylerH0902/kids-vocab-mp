@@ -9,6 +9,8 @@ const BOOK_COLORS = {
   alice2:       '#00C896',
   alice3:       '#FF69B4',
   charlotteweb: '#5C8A3C',
+  magicbeach:   '#00BFFF',
+  knightdragon: '#C0392B',
 };
 
 Page({

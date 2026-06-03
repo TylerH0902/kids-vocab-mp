@@ -2,6 +2,7 @@ const auth = require('./utils/auth');
 
 App({
   onLaunch() {
+    wx.cloud.init({ env: 'kidsvocab-d2gqnyhon1c74fca7', traceUser: true });
     const lang = wx.getStorageSync('lang') || 'en';
     this.globalData.lang = lang;
     this.globalData.mode = wx.getStorageSync('mode') || 'quest';

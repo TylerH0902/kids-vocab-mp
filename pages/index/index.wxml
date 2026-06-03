@@ -30,4 +30,22 @@
 
   <text class="hint {{hintVisible?'':'hint-hidden'}}">{{hintText}}</text>
 
+  <!-- Stats panel below map -->
+  <view class="stats-panel">
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-lbl">⭐ {{lang==='en'?'Points':'积分'}}</text>
+        <text class="stat-val">{{statPoints}}</text>
+      </view>
+      <view class="stat-sep" />
+      <view class="stat-item">
+        <text class="stat-lbl">🗺️ {{lang==='en'?'Quest':'任务'}}</text>
+        <text class="stat-val">{{statCompleted}}/7</text>
+      </view>
+    </view>
+    <view class="quest-bar-track">
+      <view class="quest-bar-fill" style="width:{{statPct}}%" />
+    </view>
+  </view>
+
 </view>

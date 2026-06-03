@@ -38,6 +38,13 @@
     {{answered ? nextLabel : checkLabel}}
   </button>
 
+  <!-- Stats strip -->
+  <view class="stat-strip">
+    <text class="strip-item">⭐ {{statPoints}} {{lang==='en'?'pts':'积分'}}</text>
+    <view class="strip-dot" />
+    <text class="strip-item">🗺️ {{statCompleted}}/7 {{lang==='en'?'done':'已完成'}}</text>
+  </view>
+
   <view class="back-row" wx:if="{{showBack}}">
     <view class="back-btn" bindtap="goHome">← {{homeLabel}}</view>
   </view>

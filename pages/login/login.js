@@ -4,25 +4,16 @@ const NOTIF_TMPL_IDS = []; // add your WeChat subscribe message template IDs her
 
 // Language-aware error strings
 const ERR = {
-  wxFail:      { en: 'WeChat login failed. Please try phone number.',  zh: '微信登录失败，请使用手机号' },
-  loginFail:   { en: 'Login failed. Please retry.',                    zh: '登录失败，请重试' },
-  wxUnavail:   { en: 'WeChat unavailable. Please try phone number.',   zh: '微信不可用，请使用手机号登录' },
-  badPhone:    { en: 'Invalid phone number.',                          zh: '手机号格式不正确' },
-  sendFail:    { en: 'Failed to send code. Check your connection.',    zh: '发送失败，请检查网络' },
-  wrongCode:   { en: 'Wrong code, please try again.',                  zh: '验证码错误，请重试' },
+  loginFail:  { en: 'Login failed. Please retry.',   zh: '登录失败，请重试' },
+  phoneDeny:  { en: 'Phone access denied.',           zh: '未授权手机号，无法登录' },
 };
 
 Page({
   data: {
-    lang:      'en',
-    wxLoading: false,
-    phone:     '',
-    code:      '',
-    codeSent:  false,
-    sending:   false,
-    countdown: 0,
-    verifying: false,
-    error:     '',
+    lang:         'en',
+    wxLoading:    false,
+    phoneLoading: false,
+    error:        '',
     // permissions screen
     showPermissions:  false,
     permAvatarUrl:    '',
@@ -31,7 +22,6 @@ Page({
     locGranted:       false,
     notifGranted:     false,
   },
-  _countdownTimer: null,
 
   onLoad() {
     if (auth.isLoggedIn()) {
@@ -42,9 +32,7 @@ Page({
     this.setData({ lang });
   },
 
-  onUnload() {
-    if (this._countdownTimer) clearInterval(this._countdownTimer);
-  },
+  onUnload() {},
 
   setLang(e) {
     const lang = e.currentTarget.dataset.val;
@@ -61,37 +49,26 @@ Page({
   // ── WeChat login ──────────────────────────────────────────────────────
   async onWxLogin() {
     if (this.data.wxLoading) return;
-    this.setData({ wxLoading: true, error: '' });
-
-    if (api.MOCK) {
-      try {
-        const user = await api.wxLogin('mock_code');
-        auth.saveSession(user);
-        this._showPermissions();
-      } catch(e) {
-        this.setData({ error: this._e('loginFail'), wxLoading: false });
-      }
-      return;
-    }
-
-    wx.login({
-      success: async (res) => {
-        if (!res.code) {
-          this.setData({ error: this._e('wxFail'), wxLoading: false });
-          return;
-        }
-        try {
-          const user = await api.wxLogin(res.code);
-          auth.saveSession(user);
-          this._showPermissions();
-        } catch(e) {
-          this.setData({ error: this._e('loginFail'), wxLoading: false });
-        }
-      },
-      fail: () => {
-        this.setData({ error: this._e('wxUnavail'), wxLoading: false });
-      },
+    const lang = this.data.lang;
+    const confirmed = await new Promise(resolve => {
+      wx.showModal({
+        title:       lang === 'en' ? 'Sign in with WeChat' : '微信登录确认',
+        content:     lang === 'en' ? 'Continue with your WeChat account?' : '使用当前微信账号登录？',
+        confirmText: lang === 'en' ? 'Continue' : '继续',
+        cancelText:  lang === 'en' ? 'Cancel'   : '取消',
+        success:     res => resolve(res.confirm),
+        fail:        ()  => resolve(false),
+      });
     });
+    if (!confirmed) return;
+    this.setData({ wxLoading: true, error: '' });
+    try {
+      const user = await api.wxLogin();
+      auth.saveSession(user);
+      this._showPermissions();
+    } catch(e) {
+      this.setData({ error: this._e('loginFail'), wxLoading: false });
+    }
   },
 
   _showPermissions() {
@@ -133,7 +110,7 @@ Page({
   },
 
   onAllowNotification() {
-    if (api.MOCK || NOTIF_TMPL_IDS.length === 0) {
+    if (NOTIF_TMPL_IDS.length === 0) {
       this.setData({ notifGranted: true });
       return;
     }
@@ -149,59 +126,20 @@ Page({
     wx.reLaunch({ url: '/pages/index/index' });
   },
 
-  // ── Phone: input handlers ─────────────────────────────────────────────
-  onPhoneInput(e) {
-    this.setData({ phone: e.detail.value, error: '' });
-  },
-
-  onCodeInput(e) {
-    this.setData({ code: e.detail.value, error: '' });
-  },
-
-  // ── Phone: send SMS code ──────────────────────────────────────────────
-  async onSendCode() {
-    const { phone, countdown, sending } = this.data;
-    if (phone.length < 11 || countdown > 0 || sending) return;
-    if (!/^1[3-9]\d{9}$/.test(phone)) {
-      this.setData({ error: this._e('badPhone') });
+  // ── Phone one-tap login ───────────────────────────────────────────────
+  async onGetPhone(e) {
+    if (e.detail.errMsg !== 'getPhoneNumber:ok') {
+      this.setData({ error: this._e('phoneDeny') });
       return;
     }
-    this.setData({ sending: true, error: '' });
+    this.setData({ phoneLoading: true, error: '' });
     try {
-      await api.sendSms(phone);
-      this.setData({ codeSent: true, sending: false });
-      this._startCountdown(60);
-    } catch(e) {
-      this.setData({ error: this._e('sendFail'), sending: false });
-    }
-  },
-
-  _startCountdown(secs) {
-    this.setData({ countdown: secs });
-    this._countdownTimer = setInterval(() => {
-      const next = this.data.countdown - 1;
-      if (next <= 0) {
-        clearInterval(this._countdownTimer);
-        this.setData({ countdown: 0 });
-      } else {
-        this.setData({ countdown: next });
-      }
-    }, 1000);
-  },
-
-  // ── Phone: verify code & log in ───────────────────────────────────────
-  async onPhoneLogin() {
-    const { code, verifying } = this.data;
-    if (code.length < 4 || verifying) return;
-    this.setData({ verifying: true, error: '' });
-    try {
-      const user = await api.verifySms(this.data.phone, code);
+      const user = await api.getPhoneNumber(e.detail.code);
       auth.saveSession(user);
       getApp().globalData.userInfo = auth.getUserProfile();
-      wx.reLaunch({ url: '/pages/index/index' });
-    } catch(e) {
-      const msg = e.message === 'wrong_code' ? this._e('wrongCode') : this._e('loginFail');
-      this.setData({ error: msg, verifying: false });
+      this._showPermissions();
+    } catch (err) {
+      this.setData({ error: this._e('loginFail'), phoneLoading: false });
     }
   },
 });

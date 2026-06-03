@@ -34,56 +34,17 @@
       <view class="divider-line" />
     </view>
 
-    <!-- Phone + code form -->
-    <view class="card">
-
-      <!-- Phone number row -->
-      <view class="phone-row">
-        <text class="prefix">+86</text>
-        <view class="vsep" />
-        <input
-          class="input-phone"
-          type="number"
-          maxlength="11"
-          placeholder="{{lang==='en' ? 'Phone number' : '手机号'}}"
-          placeholder-class="input-ph"
-          value="{{phone}}"
-          bindinput="onPhoneInput"
-          disabled="{{codeSent}}"
-        />
-        <button
-          class="btn-send {{countdown>0?'btn-send-count':''}}"
-          bindtap="onSendCode"
-          loading="{{sending}}"
-          disabled="{{phone.length<11||countdown>0||sending}}"
-        >{{countdown>0 ? countdown+'s' : (lang==='en'?'Send Code':'发送验证码')}}</button>
-      </view>
-
-      <!-- Verification code row (appears after sending) -->
-      <view wx:if="{{codeSent}}" class="code-row">
-        <text class="code-label">{{lang==='en' ? 'Code' : '验证码'}}</text>
-        <input
-          class="input-code"
-          type="number"
-          maxlength="6"
-          placeholder="{{lang==='en' ? '6-digit code' : '6 位验证码'}}"
-          placeholder-class="input-ph"
-          value="{{code}}"
-          bindinput="onCodeInput"
-          focus="{{codeSent}}"
-        />
-      </view>
-
-      <!-- Confirm login button -->
-      <button
-        wx:if="{{codeSent}}"
-        class="btn-phone-login {{code.length>=4?'btn-ready':''}}"
-        bindtap="onPhoneLogin"
-        loading="{{verifying}}"
-        disabled="{{code.length<4||verifying}}"
-      >{{lang==='en' ? 'Login' : '登录'}}</button>
-
-    </view>
+    <!-- Phone one-tap login -->
+    <button
+      class="btn-phone {{phoneLoading?'btn-loading':''}}"
+      open-type="getPhoneNumber"
+      bindgetphonenumber="onGetPhone"
+      loading="{{phoneLoading}}"
+      disabled="{{phoneLoading}}"
+    >
+      <text class="phone-icon">📱</text>
+      <text>{{phoneLoading ? (lang==='en'?'Logging in…':'登录中…') : (lang==='en'?'Continue with Phone':'手机号一键登录')}}</text>
+    </button>
 
     <!-- Error message -->
     <text wx:if="{{error}}" class="error-msg">{{error}}</text>

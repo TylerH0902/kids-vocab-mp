@@ -1,5 +1,7 @@
-const BOOKS = require('../../utils/books');
-const { t }  = require('../../utils/i18n');
+const BOOKS        = require('../../utils/books');
+const { t }        = require('../../utils/i18n');
+const achievements = require('../../utils/achievements');
+const progress     = require('../../utils/progress');
 
 const QUEST_SIZE = 20;   // questions drawn per trail from the full pool
 
@@ -36,6 +38,8 @@ Page({
     replayLabel:     'Replay',
     nextLabel:       'Next',
     doneLabel:       'Done',
+    statPoints:      0,
+    statCompleted:   0,
   },
 
   _audioCtx: null,
@@ -58,6 +62,11 @@ Page({
       replayLabel: lang === 'en' ? 'Replay' : '重播',
       nextLabel:   lang === 'en' ? 'Next' : '下一题',
       doneLabel:   lang === 'en' ? 'Done' : '完成',
+    });
+
+    this.setData({
+      statPoints:    achievements.getBalance(),
+      statCompleted: progress.getQuestState().completedInQuest.length,
     });
 
     this._loadQuestion(0);

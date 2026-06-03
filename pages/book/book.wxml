@@ -41,6 +41,13 @@
     </view>
   </view>
 
+  <!-- Stats strip -->
+  <view class="stat-strip">
+    <text class="strip-item">⭐ {{statPoints}} {{lang==='en'?'pts':'积分'}}</text>
+    <view class="strip-dot" />
+    <text class="strip-item">🗺️ {{statCompleted}}/7 {{lang==='en'?'done':'已完成'}}</text>
+  </view>
+
   <!-- Fireworks canvas -->
   <canvas type="2d" id="fw-canvas" class="fw-canvas" wx:if="{{fwVisible}}"></canvas>
 
