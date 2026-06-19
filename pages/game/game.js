@@ -149,7 +149,8 @@ Page({
     const ctx = wx.createInnerAudioContext();
     this._audioCtx = ctx;
     ctx.autoplay = true;
-    ctx.src = `https://tylerh0902.github.io/kids-vocab-audio/${lang}/${wordId}.mp3`;
+    const { AUDIO_CDN } = require('../../utils/api');
+    ctx.src = `${AUDIO_CDN}/${lang}/${wordId}.mp3`;
     ctx.onEnded(() => { this._audioCtx = null; ctx.destroy(); });
     ctx.onError(e  => { console.error('[audio] failed:', wordId, e); this._audioCtx = null; ctx.destroy(); });
   },

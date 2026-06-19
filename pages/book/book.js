@@ -151,9 +151,9 @@ Page({
   },
 
   _bookAudioUrl(qid, optIdx, lang) {
-    const base = 'https://tylerh0902.github.io/kids-vocab-audio/book';
+    const { AUDIO_CDN } = require('../../utils/api');
     const file = optIdx !== null ? `${qid}_${optIdx}.mp3` : `${qid}.mp3`;
-    return `${base}/${lang}/${file}`;
+    return `${AUDIO_CDN}/book/${lang}/${file}`;
   },
 
   _playUrl(url) {
