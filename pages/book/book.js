@@ -98,7 +98,6 @@ Page({
       progress:        Math.round((idx / total) * 100),
     });
 
-    this._playUrl(this._bookAudioUrl(q.qid, null, lang));
   },
 
   setLang(e) {
@@ -162,10 +161,15 @@ Page({
     this.setData({ speaking: true });
     const ctx = wx.createInnerAudioContext();
     this._audioCtx = ctx;
+    ctx.autoplay = true;  // play once loaded — more reliable on real devices than calling play() immediately
     ctx.src = url;
-    ctx.play();
     ctx.onEnded(() => { this.setData({ speaking: false }); ctx.destroy(); this._audioCtx = null; });
-    ctx.onError(() => { this.setData({ speaking: false }); ctx.destroy(); this._audioCtx = null; });
+    ctx.onError(e => {
+      console.error('[audio] failed:', url, e);
+      this.setData({ speaking: false });
+      ctx.destroy();
+      this._audioCtx = null;
+    });
   },
 
   _stopAudio() {
