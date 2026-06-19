@@ -18,11 +18,7 @@
   <text class="book-label">{{bookEmoji}} {{bookTitle}}</text>
   <view class="question-card">
     <text class="question-text">{{question}}</text>
-  </view>
-  <view class="speak-row">
-    <view class="replay-btn {{speaking?'speaking':''}}" bindtap="speakQuestion">
-      🔊 {{speaking ? '...' : replayLabel}}
-    </view>
+    <view class="q-speaker {{speaking?'speaking':''}}" bindtap="speakQuestion">🔊</view>
   </view>
 
   <!-- Choices -->
