@@ -4,8 +4,8 @@ const NOTIF_TMPL_IDS = []; // add your WeChat subscribe message template IDs her
 
 // Language-aware error strings
 const ERR = {
-  loginFail:  { en: 'Login failed. Please retry.',   zh: '登录失败，请重试' },
-  phoneDeny:  { en: 'Phone access denied.',           zh: '未授权手机号，无法登录' },
+  loginFail:  { en: 'Login failed. Please retry.',                              zh: '登录失败，请重试' },
+  phoneDeny:  { en: 'Phone login unavailable. Please use WeChat login.',        zh: '手机号登录暂不可用，请使用微信登录' },
 };
 
 Page({
@@ -48,18 +48,6 @@ Page({
   // ── WeChat login ──────────────────────────────────────────────────────
   async onWxLogin() {
     if (this.data.wxLoading) return;
-    const lang = this.data.lang;
-    const confirmed = await new Promise(resolve => {
-      wx.showModal({
-        title:       lang === 'en' ? 'Sign in with WeChat' : '微信登录确认',
-        content:     lang === 'en' ? 'Continue with your WeChat account?' : '使用当前微信账号登录？',
-        confirmText: lang === 'en' ? 'Continue' : '继续',
-        cancelText:  lang === 'en' ? 'Cancel'   : '取消',
-        success:     res => resolve(res.confirm),
-        fail:        ()  => resolve(false),
-      });
-    });
-    if (!confirmed) return;
     this.setData({ wxLoading: true, error: '' });
     try {
       const user = await api.wxLogin();
