@@ -2,6 +2,7 @@ const BOOKS        = require('../../utils/books');
 const { t }        = require('../../utils/i18n');
 const achievements = require('../../utils/achievements');
 const progress     = require('../../utils/progress');
+const { AUDIO_CDN } = require('../../utils/api');
 
 const QUEST_SIZE = 20;   // questions drawn per trail from the full pool
 
@@ -151,7 +152,6 @@ Page({
   },
 
   _bookAudioUrl(qid, optIdx, lang) {
-    const { AUDIO_CDN } = require('../../utils/api');
     const file = optIdx !== null ? `${qid}_${optIdx}.mp3` : `${qid}.mp3`;
     return `${AUDIO_CDN}/book/${lang}/${file}`;
   },
