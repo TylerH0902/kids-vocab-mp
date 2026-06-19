@@ -27,25 +27,6 @@
       <text>{{wxLoading ? (lang==='en'?'Logging in…':'登录中…') : (lang==='en'?'Continue with WeChat':'微信登录')}}</text>
     </button>
 
-    <!-- Divider -->
-    <view class="divider">
-      <view class="divider-line" />
-      <text class="divider-or">{{lang==='en' ? 'or' : '或'}}</text>
-      <view class="divider-line" />
-    </view>
-
-    <!-- Phone one-tap login -->
-    <button
-      class="btn-phone {{phoneLoading?'btn-loading':''}}"
-      open-type="getPhoneNumber"
-      bindgetphonenumber="onGetPhone"
-      loading="{{phoneLoading}}"
-      disabled="{{phoneLoading}}"
-    >
-      <text class="phone-icon">📱</text>
-      <text>{{phoneLoading ? (lang==='en'?'Logging in…':'登录中…') : (lang==='en'?'Continue with Phone':'手机号一键登录')}}</text>
-    </button>
-
     <!-- Error message -->
     <text wx:if="{{error}}" class="error-msg">{{error}}</text>
 

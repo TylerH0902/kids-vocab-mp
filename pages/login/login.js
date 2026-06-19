@@ -1,19 +1,18 @@
 const auth = require('../../utils/auth');
 const api  = require('../../utils/api');
-const NOTIF_TMPL_IDS = []; // add your WeChat subscribe message template IDs here
+const NOTIF_TMPL_IDS = []; // add WeChat subscribe message template IDs when available
+// TODO: add phone login when business account (企业认证) is verified
 
 // Language-aware error strings
 const ERR = {
-  loginFail:  { en: 'Login failed. Please retry.',                              zh: '登录失败，请重试' },
-  phoneDeny:  { en: 'Phone login unavailable. Please use WeChat login.',        zh: '手机号登录暂不可用，请使用微信登录' },
+  loginFail: { en: 'Login failed. Please retry.', zh: '登录失败，请重试' },
 };
 
 Page({
   data: {
-    lang:         'en',
-    wxLoading:    false,
-    phoneLoading: false,
-    error:        '',
+    lang:      'en',
+    wxLoading: false,
+    error:     '',
     // permissions screen
     showPermissions:  false,
     permAvatarUrl:    '',
@@ -104,20 +103,4 @@ Page({
     wx.reLaunch({ url: '/pages/index/index' });
   },
 
-  // ── Phone one-tap login ───────────────────────────────────────────────
-  async onGetPhone(e) {
-    if (e.detail.errMsg !== 'getPhoneNumber:ok') {
-      this.setData({ error: this._e('phoneDeny') });
-      return;
-    }
-    this.setData({ phoneLoading: true, error: '' });
-    try {
-      const user = await api.getPhoneNumber(e.detail.code);
-      auth.saveSession(user);
-      getApp().globalData.userInfo = auth.getUserProfile();
-      this._showPermissions();
-    } catch (err) {
-      this.setData({ error: this._e('loginFail'), phoneLoading: false });
-    }
-  },
 });
