@@ -49,23 +49,42 @@ Page({
     if (this.data.wxLoading) return;
     this.setData({ wxLoading: true, error: '' });
     try {
+      // wx.getUserProfile triggers WeChat's native confirmation page
+      // showing the user's avatar + nickname before authorising the mini program
+      const lang = this.data.lang;
+      const profileRes = await new Promise((resolve, reject) => {
+        wx.getUserProfile({
+          desc: lang === 'en'
+            ? 'Used to set up your reading profile'
+            : '用于建立您的阅读档案',
+          success: resolve,
+          fail:    reject,
+        });
+      });
+      const { nickName: nickname, avatarUrl } = profileRes.userInfo;
+
+      // Log in via cloud function (gets OPENID server-side)
       const user = await api.wxLogin();
-      auth.saveSession(user);
+      // Persist WeChat profile so permissions screen is pre-filled
+      auth.saveSession({ ...user, nickname, avatarUrl });
+      auth.updateProfile({ nickname, avatarUrl });
       this._showPermissions();
     } catch(e) {
-      this.setData({ error: this._e('loginFail'), wxLoading: false });
+      // User cancelled the WeChat confirmation page, or API unavailable
+      this.setData({ error: '', wxLoading: false });
     }
   },
 
   _showPermissions() {
-    const profile = auth.getUserProfile();
+    const profile  = auth.getUserProfile();
     const nickname = (profile && profile.nickname) || 'Explorer';
+    const avatar   = (profile && profile.avatarUrl) || '';
     this.setData({
       showPermissions:  true,
       wxLoading:        false,
       permNickname:     nickname,
       permAvatarLetter: nickname.charAt(0).toUpperCase(),
-      permAvatarUrl:    (profile && profile.avatarUrl) || '',
+      permAvatarUrl:    avatar,
       notifGranted:     false,
     });
   },
