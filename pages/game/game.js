@@ -3,6 +3,7 @@ const { fetchWordImage } = require('../../utils/pixabay');
 const { t }              = require('../../utils/i18n');
 const achievements       = require('../../utils/achievements');
 const progress           = require('../../utils/progress');
+const { AUDIO_CDN }      = require('../../utils/api');
 
 Page({
   data: {
@@ -149,7 +150,6 @@ Page({
     const ctx = wx.createInnerAudioContext();
     this._audioCtx = ctx;
     ctx.autoplay = true;
-    const { AUDIO_CDN } = require('../../utils/api');
     ctx.src = `${AUDIO_CDN}/${lang}/${wordId}.mp3`;
     ctx.onEnded(() => { this._audioCtx = null; ctx.destroy(); });
     ctx.onError(e  => { console.error('[audio] failed:', wordId, e); this._audioCtx = null; ctx.destroy(); });
