@@ -47,31 +47,27 @@ Page({
   // ── WeChat login ──────────────────────────────────────────────────────
   async onWxLogin() {
     if (this.data.wxLoading) return;
+    const lang = this.data.lang;
+    const confirmed = await new Promise(resolve => {
+      wx.showModal({
+        title:       lang === 'en' ? '微信登录 / WeChat Sign In' : '微信登录',
+        content:     lang === 'en'
+          ? 'Sign in using the WeChat account on this device. You can set your name and photo on the next screen.'
+          : '使用本设备上的微信账号登录。您可以在下一页设置昵称和头像。',
+        confirmText: lang === 'en' ? 'Sign in' : '登录',
+        cancelText:  lang === 'en' ? 'Cancel'  : '取消',
+        success:     res => resolve(res.confirm),
+        fail:        ()  => resolve(false),
+      });
+    });
+    if (!confirmed) return;
     this.setData({ wxLoading: true, error: '' });
     try {
-      // wx.getUserProfile triggers WeChat's native confirmation page
-      // showing the user's avatar + nickname before authorising the mini program
-      const lang = this.data.lang;
-      const profileRes = await new Promise((resolve, reject) => {
-        wx.getUserProfile({
-          desc: lang === 'en'
-            ? 'Used to set up your reading profile'
-            : '用于建立您的阅读档案',
-          success: resolve,
-          fail:    reject,
-        });
-      });
-      const { nickName: nickname, avatarUrl } = profileRes.userInfo;
-
-      // Log in via cloud function (gets OPENID server-side)
       const user = await api.wxLogin();
-      // Persist WeChat profile so permissions screen is pre-filled
-      auth.saveSession({ ...user, nickname, avatarUrl });
-      auth.updateProfile({ nickname, avatarUrl });
+      auth.saveSession(user);
       this._showPermissions();
     } catch(e) {
-      // User cancelled the WeChat confirmation page, or API unavailable
-      this.setData({ error: '', wxLoading: false });
+      this.setData({ error: this._e('loginFail'), wxLoading: false });
     }
   },
 
