@@ -64,6 +64,19 @@
 
         <view class="perm-row">
           <view class="perm-row-left">
+            <text class="perm-icon">📍</text>
+            <view class="perm-row-text">
+              <text class="perm-row-title">{{lang==='en'?'Location':'位置服务'}}</text>
+              <text class="perm-row-sub">{{lang==='en'?'For nearby reading events':'推荐附近学习活动'}}</text>
+            </view>
+          </view>
+          <view class="perm-allow-btn {{locGranted?'granted':''}}" bindtap="onAllowLocation">
+            {{locGranted?(lang==='en'?'✓ On':'✓ 已开'):(lang==='en'?'Allow':'允许')}}
+          </view>
+        </view>
+
+        <view class="perm-row">
+          <view class="perm-row-left">
             <text class="perm-icon">🔔</text>
             <view class="perm-row-text">
               <text class="perm-row-title">{{lang==='en'?'Notifications':'消息通知'}}</text>

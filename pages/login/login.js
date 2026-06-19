@@ -10,14 +10,15 @@ const ERR = {
 
 Page({
   data: {
-    lang:      'en',
+    lang:      'zh',
     wxLoading: false,
     error:     '',
     // permissions screen
     showPermissions:  false,
     permAvatarUrl:    '',
-    permAvatarLetter: 'E',
+    permAvatarLetter: '探',
     permNickname:     '',
+    locGranted:       false,
     notifGranted:     false,
   },
 
@@ -26,7 +27,7 @@ Page({
       wx.reLaunch({ url: '/pages/index/index' });
       return;
     }
-    const lang = wx.getStorageSync('lang') || 'en';
+    const lang = wx.getStorageSync('lang') || 'zh';
     this.setData({ lang });
   },
 
@@ -73,7 +74,7 @@ Page({
 
   _showPermissions() {
     const profile  = auth.getUserProfile();
-    const nickname = (profile && profile.nickname) || 'Explorer';
+    const nickname = (profile && profile.nickname) || (this.data.lang === 'en' ? 'Explorer' : '小探险家');
     const avatar   = (profile && profile.avatarUrl) || '';
     this.setData({
       showPermissions:  true,
@@ -81,6 +82,7 @@ Page({
       permNickname:     nickname,
       permAvatarLetter: nickname.charAt(0).toUpperCase(),
       permAvatarUrl:    avatar,
+      locGranted:       false,
       notifGranted:     false,
     });
   },
@@ -96,9 +98,17 @@ Page({
     const nickname = e.detail.value || '';
     this.setData({
       permNickname:     nickname,
-      permAvatarLetter: nickname.charAt(0).toUpperCase() || 'E',
+      permAvatarLetter: nickname.charAt(0).toUpperCase() || '探',
     });
     if (nickname) auth.updateProfile({ nickname });
+  },
+
+  onAllowLocation() {
+    wx.authorize({
+      scope:   'scope.userLocation',
+      success: () => this.setData({ locGranted: true }),
+      fail:    () => {},
+    });
   },
 
   onAllowNotification() {

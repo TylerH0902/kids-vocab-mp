@@ -20,5 +20,13 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于推荐附近的学习活动"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ]
 }
