@@ -19,7 +19,6 @@ Page({
     permAvatarUrl:    '',
     permAvatarLetter: 'E',
     permNickname:     '',
-    locGranted:       false,
     notifGranted:     false,
   },
 
@@ -80,7 +79,6 @@ Page({
       permNickname:     nickname,
       permAvatarLetter: nickname.charAt(0).toUpperCase(),
       permAvatarUrl:    (profile && profile.avatarUrl) || '',
-      locGranted:       false,
       notifGranted:     false,
     });
   },
@@ -99,14 +97,6 @@ Page({
       permAvatarLetter: nickname.charAt(0).toUpperCase() || 'E',
     });
     if (nickname) auth.updateProfile({ nickname });
-  },
-
-  onAllowLocation() {
-    wx.authorize({
-      scope: 'scope.userLocation',
-      success: () => this.setData({ locGranted: true }),
-      fail:    () => {},
-    });
   },
 
   onAllowNotification() {

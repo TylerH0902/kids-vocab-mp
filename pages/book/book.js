@@ -208,7 +208,7 @@ Page({
 
   // ── Fireworks (Canvas 2D) ─────────────────────────────────────────
   _startFireworks() {
-    const sys = wx.getSystemInfoSync();
+    const sys = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
     const dpr = sys.pixelRatio;
 
     wx.createSelectorQuery()
